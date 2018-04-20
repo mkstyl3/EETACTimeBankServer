@@ -29,7 +29,7 @@ app.use('/users', require('./routes/users'));
 app.use('/activities', require('./routes/activities'));
 
 // Mongoose
-mongoose.connect('mongodb://localhost/users');
+mongoose.connect('mongodb://localhost/EetacTimeBanc');
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
