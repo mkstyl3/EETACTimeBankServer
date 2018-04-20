@@ -7,9 +7,9 @@ let ActivitySchema = new mongoose.Schema(
         latitude:      { type: Number,   required: true },  // Campo obligatório para insertar
         longitude:     { type: Number,   required: true },  // Campo obligatório para insertar
         cost:          { type: Number,   required: true },  // Campo obligatório para insertar
-        user1:         { type: String,   required: true },  // Campo obligatório para insertar
-        user2:         { type: String },
+        user:          { type: String,   required: true },  // Campo obligatório para insertar
         description:   { type: String },
+        image:         { type: String},
         tags:          { type: [String] },
         date:          { type: Date,     default: Date.now },
         isDone:        { type: Boolean,  default: false }
