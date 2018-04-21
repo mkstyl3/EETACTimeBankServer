@@ -40,7 +40,7 @@ exports.signIn = async(req,res,next) => {
             }
         );
 
-        if (req.body.request.password === user.password) {
+        if ((req.body.request.password === user.password) && (user.admin === false)) {
             return res.send({
                     requestId: null,
                     responseId: 1,
@@ -51,7 +51,7 @@ exports.signIn = async(req,res,next) => {
             );
         }
 
-        if ((req.body.request.password === user.password) && user.role === 'Admin') {
+        if ((req.body.request.password === user.password) && (user.admin === true)) {
             return res.send({
                     requestId: null,
                     responseId: 2,
