@@ -7,6 +7,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const chat = require('./chat');
+
 
 //////////////////////// Middlewares ///////////////////////////////
 
@@ -27,6 +31,7 @@ app.use(bodyParser.json());
 //Routes
 app.use('/users', require('./routes/users'));
 app.use('/activities', require('./routes/activities'));
+app.use('/chats', require('./routes/chats'));
 
 // Mongoose
 mongoose.connect('mongodb://localhost/EetacTimeBanc');
@@ -36,4 +41,5 @@ db.once('open', function() {
     console.log('Connected to Database');
 });
 
+chat.chat(io);
 module.exports = app;
