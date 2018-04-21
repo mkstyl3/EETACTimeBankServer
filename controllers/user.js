@@ -1,8 +1,8 @@
 const User = require('../../EETACTimeBankServer/models/user');
 
 //Función para entrar en el sistema
+//try-catch are implicit thanks to the express-promise-router lib
 exports.signIn = async(req,res,next) => {
-    
     User.findOne({username:req.body.request.username}, (err, user) => {
         if (!user) return res.send( {
             requestId: null,
@@ -21,7 +21,7 @@ exports.signIn = async(req,res,next) => {
             }
         );
 
-        if (req.body.request.password === user.password) {
+        if ((req.body.request.password === user.password) && (user.admin === false)) {
             return res.send({
                     requestId: null,
                     responseId: 1,
@@ -32,7 +32,7 @@ exports.signIn = async(req,res,next) => {
             );
         }
 
-        if ((req.body.request.password === user.password) && user.role === 'Admin') {
+        if ((req.body.request.password === user.password) && (user.admin === true)) {
             return res.send({
                     requestId: null,
                     responseId: 2,
@@ -52,6 +52,17 @@ exports.signIn = async(req,res,next) => {
             }
         );
     })
+};
+
+// Inserta un nuevo usuario (username único). No tocar xD
+exports.insertUser = function(req, res) {
+    let newUser = new User(req.body);
+    newUser.save(function(err, user) {
+        if (err)
+            res.send(err);
+        res.json(user);
+        console.log(err + user);
+    });
 };
 
 // Devuelve una lista con todos los usuarios
@@ -84,17 +95,7 @@ exports.selectOneUser = function (req, res) {
         );
 };
 
-// Inserta un nuevo usuario (username único)
-exports.insertUser = function (req, res) {
-    User(req.body).save(function (err) {
-        if(err){
-            console.log(err);
-            return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
-        }else{
-            return res.status(201).send({'result': 'INSERTADO'}); // Devuelve un JSON
-        }
-    });
-};
+
 
 // Actualiza la información de un usuario
 exports.updateUser = function (req, res) {

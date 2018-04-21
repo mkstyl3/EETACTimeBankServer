@@ -34,7 +34,7 @@ app.use('/activities', require('./routes/activities'));
 app.use('/chats', require('./routes/chats'));
 
 // Mongoose
-mongoose.connect('mongodb://localhost/EetacTimeBanc');
+mongoose.connect('mongodb://localhost/EetacTimeBank');
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
