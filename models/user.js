@@ -11,9 +11,9 @@ const userSchema = new mongoose.Schema({
     wallet:        { type: Number, default: 10 },
     rating:        { type: Number, default: 0 },
     numVal:        { type: Number, default: 0 },
-    offered: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
-    received: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
+    offered:       [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
+    received:      [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
     admin: Boolean
-}, {collection:'users'});
+});
 
 module.exports = mongoose.model('User', userSchema);

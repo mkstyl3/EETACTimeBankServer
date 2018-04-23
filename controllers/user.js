@@ -56,34 +56,35 @@ exports.signIn = async(req,res,next) => {
 
 // Inserta un nuevo usuario (username único). No tocar xD
 exports.insertUser = function(req, res) {
-    let newUser = new User(req.body);
-    newUser.save(function(err, user) {
-        if (err)
-            res.send(err);
-        res.json(user);
-        console.log(err + user);
+    User(req.body).save(function(err, user) {
+        if(err){
+            console.log(err);
+            return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
+        }else{
+            return res.status(201).send(user);                    // Devuelve un JSON
+        }
     });
 };
 
 // Devuelve una lista con todos los usuarios
 exports.selectAllUsers = function (req, res) {
     User.find({}, { __v: false })
-        .populate('listaOfertada').populate('listaRecibida')
+        .populate('offered', { __v: false }).populate('received', { __v: false })
         .exec( function (err, users) {
-                if (err) {
-                    console.log(err);
-                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
-                } else {
-                    return res.status(200).send(users);                // Devuelve un JSON
-                }
-            }
-        );
+        if (err) {
+            console.log(err);
+            return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+        } else {
+            return res.status(200).send(users);                // Devuelve un JSON
+        }
+    }
+    );
 };
 
 // Devuelve el usuario buscado
 exports.selectOneUser = function (req, res) {
     User.findOne({ username: req.params.name }, { __v: false })
-        .populate('listaOfertada').populate('listaRecibida')
+        .populate('offered',{ __v: false }).populate('received', { __v: false })
         .exec( function (err, user) {
                 if(err){
                     console.log(err);
@@ -94,8 +95,6 @@ exports.selectOneUser = function (req, res) {
             }
         );
 };
-
-
 
 // Actualiza la información de un usuario
 exports.updateUser = function (req, res) {
