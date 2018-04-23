@@ -4,7 +4,7 @@ const HashMap = require('hashmap');
 exports.chat = function (io)
 {
     let usersHashMap = new HashMap();
-    console.log('inits socket server');
+    console.log('Inits Socket Server');
     io.on('connection',function(socket){
         var user = null;
 
