@@ -1,55 +1,29 @@
 const User = require('../../EETACTimeBankServer/models/user');
+const { createToken, verifyToken } = require('../common/access.js');
 
 //Función para entrar en el sistema
 //try-catch are implicit thanks to the express-promise-router lib
 exports.signIn = async(req,res,next) => {
     User.findOne({username:req.body.request.username}, (err, user) => {
         if (!user) return res.send( {
-            requestId: null,
-            responseId: -1,
-            request: req.body.request,
-            response: "User doesn't exist",
-            user: null
+            response: "User not exist",
         });
-
         if (err) return res.send({
-                requestId: null,
-                responseId: -3,
-                request: req.body.request,
-                response: err.toString(),
-                user: null
+            response: err.toString(),
             }
         );
-
-        if ((req.body.request.password === user.password) && (user.admin === false)) {
-            return res.send({
-                    requestId: null,
-                    responseId: 1,
-                    request: req.body.request,
-                    response: 'Hello '+user.username,
-                    user: user
-                }
-            );
+        if ((req.body.request.password === user.password) && (user.admin === false)) { //the user exists
+            const token = createToken({ id: user._id });
+            console.log(token)
+            return res.send({ token });
         }
-
         if ((req.body.request.password === user.password) && (user.admin === true)) {
-            return res.send({
-                    requestId: null,
-                    responseId: 2,
-                    request: req.body.request,
-                    response: 'Hello Admin '+user.username,
-                    user: user
-                }
-            );
+            const token = createToken({ id: user._id });
+            return res.send({ token });
         }
-
         else return res.send({
-                requestId: null,
-                responseId: -2,
-                request: req.body.request,
                 response: 'Invalid password',
-                user: null
-            }
+                }
         );
     })
 };
@@ -99,14 +73,15 @@ exports.selectOneUser = function (req, res) {
 
 // Actualiza la información de un usuario
 exports.updateUser = function (req, res) {
-    User.update({ username: req.params.name }, req.body, function(err) {
-        if (err) {
-            console.log(err);
-            return res.status(202).send({'result': 'ERROR'});       // Devuelve un JSON
-        }else{
-            return res.status(200).send({'result': 'ACTUALIZADO'}); // Devuelve un JSON
-        }
-    });
+    const userToUpdate = req.params.id;
+        User.update({ _id: userToUpdate }, req.body, function(err) {
+            if (err) {
+                return res.status(202).send({'result': 'ERROR'});       // Devuelve un JSON
+            } else{
+                return res.status(200).send({'result': 'ACTUALIZADO'}); // Devuelve un JSON
+            }
+        });
+
 };
 
 // Elimina de la Base de Datos el usuario buscado

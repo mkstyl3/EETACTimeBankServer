@@ -10,6 +10,9 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const chat = require('./chat');
+const MongoDB =require('./controllers/dataBase')
+
+
 
 
 //////////////////////// Middlewares ///////////////////////////////
@@ -34,12 +37,9 @@ app.use('/activities', require('./routes/activities'));
 app.use('/chats', require('./routes/chats'));
 
 // Mongoose
-mongoose.connect('mongodb://localhost/EetacTimeBank');
-let db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    console.log('Connected to Database');
-});
+MongoDB.connect();
 
+//chat connections
 chat.chat(io);
+
 module.exports = app;

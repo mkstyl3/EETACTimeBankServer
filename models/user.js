@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     numVal:        { type: Number, default: 0 },
     offered: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
     received: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
-    admin: Boolean
+    admin: { type: Boolean, default: false },
 }, {collection:'users'});
 
 module.exports = mongoose.model('User', userSchema);
