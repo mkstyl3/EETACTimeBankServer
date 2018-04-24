@@ -7,7 +7,7 @@ const { JWT_SECRET } = require('../configs/keys');
 
 signToken = user => {
     return JWT.sign({
-        iss: 'eetac.upc.dsa',
+        iss: 'eetac.upc.ea',
         sub: user.id,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() +1) // Current time +1 day ahead
@@ -45,29 +45,14 @@ module.exports = {
         //res.json(user);  
         
     },
-    
+  
     secret: async (req, res, next) => {
         console.log('I managed to get here!');
         res.json({ secret: 'resource'});
     },
 
     // Devuelve una lista con todos los usuarios
-    selectAllUsers: function (req, res) {
-        User.find({}, { __v: false })
-            .populate('listaOfertada').populate('listaRecibida')
-            .exec( function (err, users) {
-                    if (err) {
-                        console.log(err);
-                        return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
-                    } else {
-                        return res.status(200).send(users);                // Devuelve un JSON
-                    }
-                }
-            );
-    },
-
-    // Devuelve una lista con todos los usuarios
-    selectAllUsers = function (req, res) {
+    selectAllUsers : function (req, res) {
         User.find({}, { __v: false })
             .populate('offered', { __v: false }).populate('received', { __v: false })
             .exec( function (err, users) {
@@ -80,7 +65,7 @@ module.exports = {
     },
 
     // Devuelve el usuario buscado
-    selectOneUser = function (req, res) {
+    selectOneUser: function (req, res) {
         User.findOne({ username: req.params.name }, { __v: false })
             .populate('offered',{ __v: false }).populate('received', { __v: false })
             .exec( function (err, user) {
@@ -95,7 +80,7 @@ module.exports = {
     },
 
     // Actualiza la información de un usuario
-    updateUser = function (req, res) {
+    updateUser: function (req, res) {
         User.update({ username: req.params.name }, req.body, function(err) {
             if (err) {
                 console.log(err);
