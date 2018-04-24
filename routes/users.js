@@ -4,7 +4,6 @@ const passport = require('passport');
 const passportConfig = require('../passport');
 const { validateBody, schemas } = require('../helpers/routeHelpers');
 
-
 // Funciones sobre Usuarios
 router.route('/signup').post(validateBody(schemas.signUp), user.signUp);
 router.route('/signin')
@@ -18,5 +17,4 @@ router.delete('/:name', user.deleteUser);  // Elimina de la Base de Datos el usu
 
 //Put this in Header data key: 'Authorization', value: token (in session storage)
 router.route('/secret').get(passport.authenticate('jwt', { session: false }), user.secret);
-
 module.exports = router;
