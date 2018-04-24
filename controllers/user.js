@@ -66,32 +66,44 @@ module.exports = {
             );
     },
 
+    // Devuelve una lista con todos los usuarios
+    selectAllUsers = function (req, res) {
+        User.find({}, { __v: false })
+            .populate('offered', { __v: false }).populate('received', { __v: false })
+            .exec( function (err, users) {
+                if (err) {
+                    console.log(err);
+                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+                } else {
+                    return res.status(200).send(users);                // Devuelve un JSON
+        }});
+    },
+
     // Devuelve el usuario buscado
-    selectOneUser: function (req, res) {
+    selectOneUser = function (req, res) {
         User.findOne({ username: req.params.name }, { __v: false })
-            .populate('listaOfertada').populate('listaRecibida')
+            .populate('offered',{ __v: false }).populate('received', { __v: false })
             .exec( function (err, user) {
-                    if(err){
-                        console.log(err);
-                        return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
-                    }else{
-                        return res.status(200).send(user);                 // Devuelve un JSON
-                    }
+                if(err) {
+                    console.log(err);
+                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+                }else{
+                    return res.status(200).send(user);                 // Devuelve un JSON
                 }
-            );
+            }
+        );
     },
 
     // Actualiza la información de un usuario
-    updateUser: function (req, res) {
+    updateUser = function (req, res) {
         User.update({ username: req.params.name }, req.body, function(err) {
             if (err) {
                 console.log(err);
                 return res.status(202).send({'result': 'ERROR'});       // Devuelve un JSON
-            }else{
-                return res.status(200).send({'result': 'ACTUALIZADO'}); // Devuelve un JSON
-            }
-        });
-    },
+        } else{
+            return res.status(200).send({'result': 'ACTUALIZADO'}); // Devuelve un JSON
+        }
+    });},
 
     // Elimina de la Base de Datos el usuario buscado
     deleteUser: function (req, res) {
@@ -103,5 +115,4 @@ module.exports = {
                 return res.status(200).send({'result': 'ELIMINADO'}); // Devuelve un JSON
             }
         });
-    }
-}
+    }}
