@@ -3,8 +3,7 @@ const Login = require('../../EETACTimeBankServer/models/login');
 const JWT = require('jsonwebtoken'); 
 const { JWT_SECRET } = require('../configs/keys');
 
-//////////////////////////try-catch blocks are implicit thanks to the express-promise-router lib from routes.users.js/////////////////////////////////////////////
-
+//try-catch blocks are implicit thanks to the express-promise-router lib from routes.users.js//
 signToken = user => {
     return JWT.sign({
         iss: 'eetac.upc.ea',
@@ -12,7 +11,7 @@ signToken = user => {
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() +1) // Current time +1 day ahead
     }, JWT_SECRET);
-}
+};
 
 module.exports = {
     //Función para entrar en el sistema
@@ -52,7 +51,7 @@ module.exports = {
     },
 
     // Devuelve una lista con todos los usuarios
-    selectAllUsers : function (req, res) {
+    selectAllUsers: async (req, res) => {
         User.find({}, { __v: false })
             .populate('offered', { __v: false }).populate('received', { __v: false })
             .exec( function (err, users) {
@@ -65,7 +64,7 @@ module.exports = {
     },
 
     // Devuelve el usuario buscado
-    selectOneUser: function (req, res) {
+    selectOneUser: async (req, res) => {
         User.findOne({ username: req.params.name }, { __v: false })
             .populate('offered',{ __v: false }).populate('received', { __v: false })
             .exec( function (err, user) {
@@ -80,7 +79,7 @@ module.exports = {
     },
 
     // Actualiza la información de un usuario
-    updateUser: function (req, res) {
+    updateUser: async (req, res) => {
         User.update({ username: req.params.name }, req.body, function(err) {
             if (err) {
                 console.log(err);
@@ -91,7 +90,7 @@ module.exports = {
     });},
 
     // Elimina de la Base de Datos el usuario buscado
-    deleteUser: function (req, res) {
+    deleteUser: async (req, res) => {
         User.remove({ username: req.params.name }, function(err) {
             if(err){
                 console.log(err);
@@ -100,4 +99,4 @@ module.exports = {
                 return res.status(200).send({'result': 'ELIMINADO'}); // Devuelve un JSON
             }
         });
-    }}
+    }};
