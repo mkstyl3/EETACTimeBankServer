@@ -36,6 +36,6 @@ userSchema.methods.isValidPassword = async function(newPassword) {
     } catch(error) {
         throw new Error(error); 
     }
-}
+};
 
 module.exports = mongoose.model('User', userSchema);
