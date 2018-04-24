@@ -7,8 +7,9 @@ const { validateBody, schemas } = require('../helpers/routeHelpers');
 // Funciones sobre Usuarios
 router.route('/signup').post(validateBody(schemas.signUp), user.signUp);
 router.route('/signin')
-    .post(validateBody(schemas.signIn), passport
+        .post(validateBody(schemas.signIn), passport
         .authenticate('local', { session: false }), user.signIn);
+
 router.get('/', user.selectAllUsers);      // Devuelve una lista con todos los usuarios
 router.get('/:name', user.selectOneUser);  // Devuelve el usuario buscado
 //router.post('/', user.insertUser);         // Inserta un nuevo usuario (username único)
