@@ -20,7 +20,7 @@ passport.use(new JwtStrategy({
         
         // Otherwise, return the user
         done(null, user);
-    } catch(error) {
+    }catch(error) {
         done(error, false);
     }
 }));
