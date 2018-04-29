@@ -92,9 +92,10 @@ exports.getRequestsPag = function(req, res){
     })
 };
 
-//llista paginada dels usuaris que m0han fet una peticio
+//llista paginada dels usuaris que m'han fet una peticio
 exports.getPetitions = function (req, res) {
     let userId = req.params.id
+    console.log(userId)
     var page = 1;
     var itemsPage = 4;
 
@@ -119,19 +120,21 @@ exports.getCounters = function (req, res) {
 }
     async function getCountPetitions(id) {
 
-        var petitions = await ActivityRequest.count({"userTo":id}).exec((err, count) => {
-            if (err)  return handleError(err);
-            console.log(count)
-            return count;
-        });
 
-        var requested = await ActivityRequest.count({"userFrom":id}).exec((err, count) => {
-            if (err) return handleError(err);
-            console.log(count)
-            return count;
-        });
-        console.log(petitions);
-        return {
-            requested: requested, petitions: petitions
-        }
+
+                var petitions = await ActivityRequest.count({"userTo":id}).exec((err, count) => {
+                    if (err)  return handleError(err);
+                    console.log(count)
+                    return count;
+                });
+
+                var requested = await ActivityRequest.count({"userFrom":id}).exec((err, count) => {
+                    if (err) return handleError(err);
+                    console.log(count)
+                    return count;
+                });
+                console.log(petitions);
+                return {
+                    requested: requested, petitions: petitions
+                }
     }
