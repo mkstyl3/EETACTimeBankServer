@@ -122,7 +122,7 @@ exports.getCounters = function (req, res) {
         var petitions = await ActivityRequest.count({"userTo":id}).exec((err, count) => {
             if (err)  return handleError(err);
             console.log(count)
-             return count;
+            return count;
         });
 
         var requested = await ActivityRequest.count({"userFrom":id}).exec((err, count) => {
