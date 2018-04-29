@@ -7,8 +7,9 @@
     "start-dev": "nodemon ./bin/www"
   },
   "dependencies": {
-    "boom": "^7.2.0",
     "bcrypt": "^2.0.1",
+    "boom": "^7.2.0",
+    "connect-multiparty": "^2.1.0",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.4",
     "debug": "~2.6.9",
@@ -20,8 +21,12 @@
     "jade": "~1.11.0",
     "joi": "^13.2.0",
     "jsonwebtoken": "^8.2.1",
+    "moment": "^2.22.1",
     "mongoose": "^5.0.15",
+    "mongoose-pagination": "^1.0.0",
     "morgan": "~1.9.0",
+    "multiparty": "^4.1.3",
+    "nodemon": "^1.17.3",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
