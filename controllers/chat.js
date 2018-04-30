@@ -1,8 +1,20 @@
 const Chat = require('../models/chat');
-
+const boom = require('boom');
 exports.getChat = function(req,res)
 {
-    const chat = [
+    if(req.params.id)
+    {
+        Chat.findById(req.params.id, (err, chat)=> {
+            if (err) return res.send(boom.badRequest());
+                res.status(200).send(chat);
+    });
+    }
+    else
+    {
+        return res.send(boom.badData("there's no an id"));
+    }
+    };
+    /*const chat = [
         {
             userTo: 5,
             userFrom: 1,
@@ -16,9 +28,18 @@ exports.getChat = function(req,res)
             sentDate: new Date(),
         }
     ];
-    return res.status(200).send(chats)
-};
+    return res.status(200).send(chats)*/
 
+exports.saveTestChat = function(req,res){
+      Chat.create(req.body, function(err,chat){
+        if(err){
+            console.log(err);
+            return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
+        }else{
+            return res.status(200).send(chat); // Devuelve un JSON
+        }
+    });
+}
 exports.getUserChats = function(req,res)
 {
     const chats = [
