@@ -10,11 +10,13 @@ router.route('/signin')
         .post(validateBody(schemas.signIn), passport
         .authenticate('local', { session: false }), user.signIn);
 
-router.get('/', user.selectAllUsers);      // Devuelve una lista con todos los usuarios
-router.get('/:name', user.selectOneUser);  // Devuelve el usuario buscado
-//router.post('/', user.insertUser);         // Inserta un nuevo usuario (username único)
-router.put('/:name', user.updateUser);     // Actualiza la información de un usuario
-router.delete('/:name', user.deleteUser);  // Elimina de la Base de Datos el usuario buscado
+router.get('/', user.selectAllUsers);             // Devuelve una lista con todos los usuarios
+router.get('/:name', user.selectOneUser);         // Devuelve el usuario buscado
+//router.post('/', user.insertUser);              // Inserta un nuevo usuario (username único)
+router.put('/:name', user.updateUser);            // Actualiza la información de un usuario
+router.delete('/:name', user.deleteUser);         // Elimina de la Base de Datos el usuario buscado
+router.post('/getUserById', user.getUserById);    // Devuelve un usuario por su id que es unica
+
 
 //Put this in Header data key: 'Authorization', value: token (in session storage)
 router.route('/secret').get(passport.authenticate('jwt', { session: false }), user.secret);

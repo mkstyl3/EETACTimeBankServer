@@ -36,6 +36,7 @@ app.use('/users',           require('./routes/users'));
 app.use('/activities',      require('./routes/activities'));
 app.use('/chats',           require('./routes/chats'));
 app.use('/activityRequest', require('./routes/activityRequest'));
+app.use('/publications',    require('./routes/publication'));
 
 // Mongoose
 MongoDB.connect();

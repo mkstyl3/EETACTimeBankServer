@@ -22,28 +22,28 @@ module.exports = {
             'userId': req.user.id
         });
     },
-    
-    // Inserta un nuevo usuario (username único). 
+
+    // Inserta un nuevo usuario (username único).
     signUp: async (req, res) => {
         console.log("I'm inside of insertUserToken!");
-        
+
         //Check if there is a user with the same username
         const foundUser = await User.findOne({ username: req.value.body.username });
-        if(foundUser) { 
+        if(foundUser) {
             return res.status(403).json({ error : 'This username is already in use'})
         }
-        
+
         const newUser = new User(req.value.body);
         let user = await newUser.save();
         let userId = user.id;
-        // Generate the token 
+        // Generate the token
         const token = signToken(newUser);
         //respond with a token
         res.status(200).json({ token, userId });
-        //res.json(user);  
-        
+        //res.json(user);
+
     },
-  
+
     secret: async (req, res, next) => {
         console.log('I managed to get here!');
         res.json({ secret: 'resource'});
@@ -98,4 +98,21 @@ module.exports = {
                 return res.status(200).send({'result': 'ELIMINADO'}); // Devuelve un JSON
             }
         });
-    }};
+    },
+
+  // Devuelve un usuario por su id
+  getUserById: async (req, res) => {
+    User.findOne({ _id: req.body.id }, { __v: false })
+      .populate('offered',{ __v: false }).populate('received', { __v: false })
+      .exec( function (err, user) {
+          if(err) {
+            console.log(err);
+            return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+          }else{
+            return res.status(200).send(user);                 // Devuelve un JSON
+          }
+        }
+      );
+  }
+};
+

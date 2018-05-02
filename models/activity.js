@@ -3,14 +3,15 @@ let mongoose = require('mongoose');
 // Declaración del esquema
 let ActivitySchema = new mongoose.Schema(
     {
-        name:           { type: String, required: true },  // Campo obligatório para insertar
-        latitude:       { type: Number, required: true },  // Campo obligatório para insertar
-        longitude:      { type: Number, required: true },  // Campo obligatório para insertar
-        cost:           { type: Number, required: true },  // Campo obligatório para insertar
-        user:           { type: String, required: true },  // Campo obligatório para insertar
-        description:    { type: String },
-        imatge:         { type: String },
-        tags:           [ { tag:String, category:String } ],
+        name:           { type: String, required: true },
+        latitude:       { type: Number},
+        longitude:      { type: Number},
+        cost:           { type: Number},
+        user:           { type: String},
+        description:    { type: String},
+        tags    :       { type: [ String ] },
+        category:       { type: [ String]},
+        imatge:         { type: String},
         date:           { type: Date, default: Date.now }
     }
 );
