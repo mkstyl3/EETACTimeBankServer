@@ -5,6 +5,7 @@ const passportConfig = require('../passport');
 const { validateBody, schemas } = require('../helpers/routeHelpers');
 
 // Funciones sobre Usuarios
+router.route('/secret').get(passport.authenticate('jwt', { session: false }), user.secret);
 router.route('/signup').post(validateBody(schemas.signUp), user.signUp);
 router.route('/signin')
         .post(validateBody(schemas.signIn), passport
@@ -19,5 +20,5 @@ router.post('/getUserById', user.getUserById);    // Devuelve un usuario por su 
 
 
 //Put this in Header data key: 'Authorization', value: token (in session storage)
-router.route('/secret').get(passport.authenticate('jwt', { session: false }), user.secret);
+
 module.exports = router;
