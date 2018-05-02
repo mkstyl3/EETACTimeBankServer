@@ -1,5 +1,4 @@
 const User = require('../../EETACTimeBankServer/models/user');
-const Login = require('../../EETACTimeBankServer/models/login');
 const JWT = require('jsonwebtoken'); 
 const { JWT_SECRET } = require('../configs/keys');
 
