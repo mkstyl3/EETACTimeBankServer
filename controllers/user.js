@@ -1,6 +1,5 @@
 const User = require('../../EETACTimeBankServer/models/user');
-const Login = require('../../EETACTimeBankServer/models/login');
-const JWT = require('jsonwebtoken');
+const JWT = require('jsonwebtoken'); 
 const { JWT_SECRET } = require('../configs/keys');
 
 //try-catch blocks are implicit thanks to the express-promise-router lib from routes.users.js//
