@@ -1,5 +1,5 @@
-const Chat = require('../models/chat');
 const boom = require('boom');
+const Chat = require('../models/chat');
 exports.getChat = function(req,res)
 {
     if(req.params.id)
@@ -44,6 +44,7 @@ exports.getUserChats = function(req,res)
 {
     const chats = [
         {
+            id: '5aeb4d9ffbe63f38202f2a0b',
             userId: 5,
             userName: 'Anna',
             userAvatar: 'https://www.vccircle.com/wp-content/uploads/2017/03/default-profile.png',
@@ -52,18 +53,21 @@ exports.getUserChats = function(req,res)
             newMessages: 2,
         },
         {
+            id: '5aeb4d9ffbe63f38202f2a0b',
             userId: 9,
             userName: 'Marc',
             socket: null,
             lastMessage: 'hola estás?'
         },
         {
+            id: '5aeb4d9ffbe63f38202f2a0b',
             userId: 1,
             userName: 'Marta',
             socket: null,
             lastMessage: 'hey'
         },
         {
+            id: '5aeb4d9ffbe63f38202f2a0b',
             userId: 5,
             userName: 'Alex',
             socket: null,

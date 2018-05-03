@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const io = require('socket.io').listen(server);
 const chat = require('./chat');
 const MongoDB =require('./controllers/dataBase')
 
@@ -40,8 +40,8 @@ app.use('/publications',    require('./routes/publication'));
 
 // Mongoose
 MongoDB.connect();
-
 //chat connections
+server.listen(8880)
 chat.chat(io);
 
 module.exports = app;
