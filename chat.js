@@ -38,7 +38,7 @@ exports.chat = function (io) {
                         else {
                             const result = OldChat.users.filter(user => user.userId !== message.userFrom);
                             if (result) {
-                                User.findOne({_id:"5ae2143eb3ed7c32f0fb8029"}, (err, userComplete) => {
+                                User.findOne({_id:result[0].userId}, (err, userComplete) => {
 
                                     if (!userComplete) return socket.emit('exception', boom.badData("there's no an user in db"));
                                     if (err) return socket.emit('exception', boom.badImplementation("there is an error"))
