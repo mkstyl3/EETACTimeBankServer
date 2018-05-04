@@ -5,7 +5,7 @@ let PublicationSchema = new mongoose.Schema(
     {
         author:         { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         text:           { type: String, required: true },  // Campo obligatório para insertar
-        date:            { type: String}
+        date:           { type: String }
     }
 );
 
