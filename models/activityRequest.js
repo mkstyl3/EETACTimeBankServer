@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 let mongoose = require('mongoose');
 
 // Declaración del esquema

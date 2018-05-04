@@ -10,10 +10,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 const chat = require('./chat');
-const MongoDB =require('./controllers/dataBase')
-
-
-
+const MongoDB =require('./controllers/dataBase');
 
 //////////////////////// Middlewares ///////////////////////////////
 
@@ -41,7 +38,7 @@ app.use('/publications',    require('./routes/publication'));
 // Mongoose
 MongoDB.connect();
 //chat connections
-server.listen(8880)
+server.listen(8880);
 chat.chat(io);
 
 module.exports = app;
