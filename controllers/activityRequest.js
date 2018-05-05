@@ -77,18 +77,15 @@ exports.deleteActivityRequest = function (req, res) {
 //llistat paginat dels usuaris que tenen una peticio meva
 exports.getRequestsPag = function(req, res){
     let userId = req.params.id
-    var page = 1;
-    var itemsPage = 4;
+    ActivityRequest.find({userFrom: userId})
+                   //.populate({path: 'activity'})
+                  // .populate({path: 'userTo'})
+                   .exec( function (err2, req2) {
+                        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
+                        if (!req2) return res.status(404).send({message: `la peticio no existeix: ${err2}`});
 
-    if(req.params.page){
-        page = req.params.page;
-    }
-    ActivityRequest.find({userFrom: userId}).populate({path: 'userTo'}).paginate(page, itemsPage, (err, req, total ) => {
-            if (err)  return res.status(500).send({message: `error al realitzar la petició: ${err}`});
-            if (!req) return res.status(404).send({message: `la peticio no existeix: ${err}`});
-
-            res.status(200).send({total: total, pages: Math.ceil(total / itemsPage), req: req});
-
+                       console.log("JUAN", req2);
+                    res.status(200).send(req2);
     })
 };
 
@@ -99,11 +96,18 @@ exports.getPetitions = function (req, res) {
     var page = 1;
     var itemsPage = 4;
 
-    ActivityRequest.find({userTo: userId}).populate({path: 'userFrom'}).paginate(page, itemsPage, (err, req, total ) => {
-        if (err)  return res.status(500).send({message: `error al realitzar la petició: ${err}`});
-        if (!req) return res.status(404).send({message: `no tens cap peticio: ${err}`});
+    //ActivityRequest.find({userTo: userId})
+    ActivityRequest.find({"_id": "5addb98090114b1df49e3930"})
+                   //populate('userFrom')
+                   // .populate('userTo')
+                   .populate('activity')
+                   .exec(function (err2, req2 ){
+                        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
+                        if (!req2) return res.status(404).send({message: `no tens cap peticio: ${err2}`});
 
-        res.status(200).send({total: total, pages: Math.ceil(total / itemsPage), req: req});
+                        console.log("PEPITO", req2);
+
+                       res.status(200).send(req2);
 
 
     })
@@ -116,24 +120,33 @@ exports.getCounters = function (req, res) {
     getCountPetitions(id).then((value)=>{
         return res.status(200).send(value);
         //console.log(value);
+    })
+        .catch((err) => {
+            return 'error occured'
     });
 }
     async function getCountPetitions(id) {
 
 
 
-                var petitions = await ActivityRequest.count({"userTo":id}).exec((err, count) => {
+               /* var petitions = await
+                    ActivityRequest.count({"userTo":id}).exec((err, count) => {
                     if (err)  return handleError(err);
                     console.log(count)
                     return count;
                 });
 
-                var requested = await ActivityRequest.count({"userFrom":id}).exec((err, count) => {
+                var requested = await
+                    ActivityRequest.count({"userFrom":id}).exec((err, count) => {
                     if (err) return handleError(err);
                     console.log(count)
                     return count;
-                });
-                console.log(petitions);
+                });*/
+
+        var petitions = await ActivityRequest.count({"userTo":id}).exec();
+        var requested = await ActivityRequest.count({"userFrom":id}).exec();
+
+                console.log("HOLA ", petitions);
                 return {
                     requested: requested, petitions: petitions
                 }

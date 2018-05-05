@@ -4,7 +4,7 @@ const activityRequest = require('../controllers/activityRequest');
 
 
 // Funciones sobre peticions
-router.get      ('/',    activityRequest.getRequests);
+router.get      ('/',                 activityRequest.getRequests);
 router.get      ('/requested/:id',    activityRequest.getRequestsPag);
 router.get      ('/petitions/:id',    activityRequest.getPetitions);
 router.get      ('/count/:id',        activityRequest.getCounters);
