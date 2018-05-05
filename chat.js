@@ -10,21 +10,56 @@ exports.chat = function (io) {
         console.log("user connected");
         var user = null;
 
-        socket.on('disconnect', function () {
-            usersHashMap.remove(user);
-            console.log("user disconnected");
-        });
 
         socket.on('init', function (msg) {
             user = msg.userFrom;
             usersHashMap.set(user, socket);
         });
+        /*DISCONNECT USER AND REMOVE HER SOCKET*/
+        socket.on('disconnect', function () {
+            usersHashMap.remove(user);
+            console.log("user disconnected");
+            User.findOne({socketId: socket.id}, (err,user) =>
+            {
+                if(err) console.log("not socket present");
+                if(user){
+                    user.socketId.splice(user.socketId.indexOf(socket.id),1);
+                    console.log("user deleted");
+                    user.save(function (err) { // => guardem missatge
+                            if (err) {
+                                console.log("no s'ha guardat");
+                            }
+                            else{
+                                console.log("guardat a la base de dades")}
+                        }
+                    );
+                }
+            })
+        });
+        /* RETURN USERS_ID OF CONNECTED USERS*/
+        socket.on('ConnectedUsers',function(){
+            User.find({socketId:{$exists:true,$ne:[]}},(err , result) =>
+            {
+                if(err) console.log("some error")
+                else{
+                    if(result){
+                        console.log(result);
+                    }
+                    else{
+                        console.log("not users connectes");
+                    }
+                }
+
+            }).select('_id')
+
+        })
+        /* ASSOCIATE USER WITH THE SOCKET_ID*/
         socket.on('newUser', function (msg) {
             const id = JSON.parse(msg)
             User.findOne({_id: id}, (err, myuser) => {
                 if (err) console.log("no user");
                 else {
-                    myuser.socketId.push(msg)
+                    myuser.socketId.push(socket.id)
                     myuser.save(function (err) { // => guardem missatge
                         if (err) {
                             console.log("no s'ha guardat");
@@ -37,6 +72,7 @@ exports.chat = function (io) {
                 ;
 
             });
+
 
             socket.on('privateMessage', function (msg) {
                 const frame = JSON.parse(msg);
@@ -81,15 +117,7 @@ exports.chat = function (io) {
                             }
                         });
 
-                        /*var socketReceptor = usersHashMap.get(userTo);
-                        if (socketReceptor != null) {
-                            var response;
-                            response.userTo = userTo;
-                            response.message = message;
-                            response.date = date;
-                            response.readIt = false;
-                            socketReceptor.emit('message', response);
-                        }*/
+
                     }
 
                 });

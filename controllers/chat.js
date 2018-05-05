@@ -1,7 +1,7 @@
 const boom = require('boom');
 const Chat = require('../models/chat');
-exports.getChat = function(req,res)
-{
+/*RETURN A PARTICULAR CHAT BY THE ID*/
+exports.getChat = function(req,res) {
     if(req.params.id)
     {
         Chat.findById(req.params.id, (err, chat)=> {
@@ -14,22 +14,7 @@ exports.getChat = function(req,res)
         return res.send(boom.badData("there's no an id"));
     }
     };
-    /*const chat = [
-        {
-            userTo: 5,
-            userFrom: 1,
-            message: 'hi!',
-            sentDate: new Date(),
-        },
-        {
-            userTo: 1,
-            userFrom: 5,
-            message: 'hola, cómo estás?',
-            sentDate: new Date(),
-        }
-    ];
-    return res.status(200).send(chats)*/
-
+/*SAVING A TEST CHAT*/
 exports.saveTestChat = function(req,res){
       Chat.create(req.body, function(err,chat){
         if(err){
@@ -40,8 +25,13 @@ exports.saveTestChat = function(req,res){
         }
     });
 }
+
 exports.getUserChats = function(req,res)
 {
+    Chat.find({'users.userId':req},(err,erro) => console.log(erro))
+
+    // res => the id from the users
+    /*
     const chats = [
         {
             id: '5aeb4d9ffbe63f38202f2a0b',
@@ -76,6 +66,7 @@ exports.getUserChats = function(req,res)
         }
     ];
     return res.status(200).send(chats);
+    */
 };
 
 exports.addChatToUsers = function(req,res)
