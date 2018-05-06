@@ -26,6 +26,7 @@
     "mongoose-pagination": "^1.0.0",
     "morgan": "~1.9.0",
     "multiparty": "^4.1.3",
+    "nodemailer": "^4.6.4",
     "nodemon": "^1.17.4",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
