@@ -76,42 +76,36 @@ exports.deleteActivityRequest = function (req, res) {
 
 //llistat paginat dels usuaris que tenen una peticio meva
 exports.getRequestsPag = function(req, res){
-    let userId = req.params.id
+    let userId = req.params.id;
     ActivityRequest.find({userFrom: userId})
-                   //.populate({path: 'activity'})
-                  // .populate({path: 'userTo'})
-                   .exec( function (err2, req2) {
-                        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
-                        if (!req2) return res.status(404).send({message: `la peticio no existeix: ${err2}`});
-
-                       console.log("JUAN", req2);
-                    res.status(200).send(req2);
+      .populate({path: 'activity'})
+      .populate({path: 'userTo'})
+      .populate({path: 'userFrom'})
+      .exec( function (err2, req2) {
+        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
+        if (!req2) return res.status(404).send({message: `la peticio no existeix: ${err2}`});
+        console.log("JUAN", req2);
+        res.status(200).send(req2);
     })
 };
 
 //llista paginada dels usuaris que m'han fet una peticio
 exports.getPetitions = function (req, res) {
-    let userId = req.params.id
-    console.log(userId)
-    var page = 1;
-    var itemsPage = 4;
-
-    //ActivityRequest.find({userTo: userId})
-    ActivityRequest.find({"_id": "5addb98090114b1df49e3930"})
-                   //populate('userFrom')
-                   // .populate('userTo')
-                   .populate('activity')
-                   .exec(function (err2, req2 ){
-                        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
-                        if (!req2) return res.status(404).send({message: `no tens cap peticio: ${err2}`});
-
-                        console.log("PEPITO", req2);
-
-                       res.status(200).send(req2);
-
-
+    let userId = req.params.id;
+    console.log(userId);
+    let page = 1;
+    let itemsPage = 4;
+    ActivityRequest.find({userTo: userId})
+    //ActivityRequest.find({"_id": "5addb98090114b1df49e3930"})
+      .populate('userFrom')
+      .populate('userTo')
+      .populate('activity')
+      .exec(function (err2, req2 ){
+        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
+        if (!req2) return res.status(404).send({message: `no tens cap peticio: ${err2}`});
+        console.log("PEPITO", req2);
+        res.status(200).send(req2);
     })
-    
 };
 
 //contadors
