@@ -17,35 +17,33 @@ exports.chat = function (io) {
         });
         /*DISCONNECT USER AND REMOVE HER SOCKET*/
         socket.on('disconnect', function () {
-            usersHashMap.remove(user);
             console.log("user disconnected");
-            User.findOne({socketId: socket.id}, (err,user) =>
-            {
-                if(err) console.log("not socket present");
-                if(user){
-                    user.socketId.splice(user.socketId.indexOf(socket.id),1);
+            User.findOne({socketId: socket.id}, (err, user) => {
+                if (err) console.log("not socket present");
+                if (user) {
+                    user.socketId.splice(user.socketId.indexOf(socket.id), 1);
                     console.log("user deleted");
                     user.save(function (err) { // => guardem missatge
                             if (err) {
                                 console.log("no s'ha guardat");
                             }
-                            else{
-                                console.log("guardat a la base de dades")}
+                            else {
+                                console.log("guardat a la base de dades")
+                            }
                         }
                     );
                 }
             })
         });
         /* RETURN USERS_ID OF CONNECTED USERS*/
-        socket.on('ConnectedUsers',function(){
-            User.find({socketId:{$exists:true,$ne:[]}},(err , result) =>
-            {
-                if(err) console.log("some error")
-                else{
-                    if(result){
+        socket.on('ConnectedUsers', function () {
+            User.find({socketId: {$exists: true, $ne: []}}, (err, result) => {
+                if (err) console.log("some error")
+                else {
+                    if (result) {
                         console.log(result);
                     }
-                    else{
+                    else {
                         console.log("not users connectes");
                     }
                 }
@@ -61,67 +59,68 @@ exports.chat = function (io) {
                 else {
                     myuser.socketId.push(socket.id)
                     myuser.save(function (err) { // => guardem missatge
-                        if (err) {
-                            console.log("no s'ha guardat");
+                            if (err) {
+                                console.log("no s'ha guardat");
+                            }
+                            else {
+                                console.log("guardat a la base de dades")
+                            }
                         }
-                        else{
-                        console.log("guardat a la base de dades")}
-                    }
                     );
                 }
                 ;
 
             });
 
+        })
+        socket.on('privateMessage', function (msg) {
+            const frame = JSON.parse(msg);
+            const {message, ...messageee} = frame;
+            const {chatId, ...mens} = frame;
+            Chat.findOne({_id: chatId}, (err, OldChat) => {
+                if (!OldChat) return socket.emit('exception', boom.badData("there's no a chat")); //=> eliminar-lo
+                if (err) return socket.emit('exception', boom.badImplementation("there is an error"))
+                    ;
+                else {
+                    OldChat.messages.push(message);
+                    OldChat.save(function (err) { // => guardem missatge
+                        if (err) {
 
-            socket.on('privateMessage', function (msg) {
-                const frame = JSON.parse(msg);
-                const {message, ...messageee} = frame;
-                const {chatId, ...mens} = frame;
-                Chat.findOne({_id: chatId}, (err, OldChat) => {
-                    if (!OldChat) return socket.emit('exception', boom.badData("there's no an id"));
-                    if (err) return socket.emit('exception', boom.badImplementation("there is an error"))
-                        ;
-                    else {
-                        OldChat.messages.push(message);
-                        OldChat.save(function (err) { // => guardem missatge
-                            if (err) {
+                            return socket.emit('exception', boom.badImplementation("there is an error"))
+                        }
+                        else {
+                            const result = OldChat.users.filter(user => user.userId !== message.userFrom);
+                            if (result) {
+                                User.findOne({_id: result[0].userId}, (err, userComplete) => {
 
-                                return socket.emit('exception', boom.badImplementation("there is an error"))
+                                    if (!userComplete) return socket.emit('exception', boom.badData("there's no an user in db"));
+                                    if (err) return socket.emit('exception', boom.badImplementation("there is an error"))
+                                    else {
+                                        if (userComplete.socketId.length === 0) {
+                                            console.log("l'usuari no està connectat");
+                                        }
+                                        else {
+                                            userComplete.socketId.forEach(function (valor) {
+                                                socket.broadcast.to(valor).emit('privateMessage', message);
+                                            });
+                                        }
+
+                                    }
+                                })
+
                             }
                             else {
-                                const result = OldChat.users.filter(user => user.userId !== message.userFrom);
-                                if (result) {
-                                    User.findOne({_id: result[0].userId}, (err, userComplete) => {
-
-                                        if (!userComplete) return socket.emit('exception', boom.badData("there's no an user in db"));
-                                        if (err) return socket.emit('exception', boom.badImplementation("there is an error"))
-                                        else {
-                                            if (userComplete.socketId.length === 0) {
-                                                console.log("l'usuari no està connectat");
-                                            }
-                                            else {
-                                                userComplete.socketId.forEach(function (valor) {
-                                                    socket.broadcast.to(valor).emit('privateMessage', message);
-                                                });
-                                            }
-
-                                        }
-                                    })
-
-                                }
-                                else {
-                                    socket.emit('exception', boom.notFound("the other user doesn't exists"))
-                                }
-
+                                socket.emit('exception', boom.notFound("the other user doesn't exists"))
                             }
-                        });
+
+                        }
+                    });
 
 
-                    }
+                }
 
-                });
             });
         });
+
     });
 }
