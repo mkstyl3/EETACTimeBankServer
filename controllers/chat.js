@@ -15,7 +15,7 @@ exports.getChat = function (req, res) {
             }
             while(i<chat.messages.length);
             chat.save();
-
+            console.log('this is the chat' +chat);
             res.status(200).send(chat);
         });
     }
