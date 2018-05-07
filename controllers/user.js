@@ -18,6 +18,7 @@ module.exports = {
         // Generate token
         const token = signToken(req.user);
         res.status(200).json({
+            'username': req.user.username,
             'token': token,
             'userId': req.user.id
         });
