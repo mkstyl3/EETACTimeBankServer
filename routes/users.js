@@ -11,8 +11,8 @@ router.route('/signin')
         .post(validateBody(schemas.signIn), passport
         .authenticate('local', { session: false }), user.signIn);
 
-router.get('/', user.selectAllUsers);             // Devuelve una lista con todos los usuarios
-router.get('/:name', user.selectOneUser);         // Devuelve el usuario buscado
+router.get('/', passport.authenticate('jwt', { session: false }), user.selectAllUsers);             // Devuelve una lista con todos los usuarios
+router.get('/:name', passport.authenticate('jwt', { session: false }), user.selectOneUser);         // Devuelve el usuario buscado
 //router.post('/', user.insertUser);              // Inserta un nuevo usuario (username único)
 router.put('/:name', user.updateUser);            // Actualiza la información de un usuario
 router.delete('/:name', user.deleteUser);         // Elimina de la Base de Datos el usuario buscado
