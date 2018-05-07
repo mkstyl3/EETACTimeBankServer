@@ -1,7 +1,9 @@
 'use strict'
 
-const ActivityRequest = require('../../EETACTimeBankServer/models/activityRequest');
+const ActivityRequest = require('../models/activityRequest');
 const User             = require('../models/user');
+const Activity         = require('../models/activity');
+
 const mongoosePaginate = require('mongoose-pagination');
 
 // Devuelve una peticio
@@ -38,7 +40,7 @@ exports.insertActivityRequest = function (req, res) {
     let activityRequest = new ActivityRequest()
         activityRequest.userFrom    = req.body.userFrom
         activityRequest.userTo      = req.body.userTo
-        activityRequest.activy      = req.body.activity
+        activityRequest.activity      = req.body.activity
 
 
     activityRequest.save((err, requestStored) => {
@@ -60,8 +62,8 @@ exports.updateRequest = function (req, res) {
 
 // Elimina una petició
 exports.deleteActivityRequest = function (req, res) {
-    let requestId = req.params.requestId
-    ActivityRequest.finById(requestId, (err, request) =>{
+    let requestId = req.params.id
+    ActivityRequest.findById(requestId, (err, request) =>{
         if (err)    res.status(500).send({message:`error al realizar la petición: ${err} `})
 
         request.remove(err => {
@@ -76,36 +78,33 @@ exports.deleteActivityRequest = function (req, res) {
 
 //llistat paginat dels usuaris que tenen una peticio meva
 exports.getRequestsPag = function(req, res){
-    let userId = req.params.id;
+    let userId = req.params.id
     ActivityRequest.find({userFrom: userId})
-      .populate({path: 'activity'})
-      .populate({path: 'userTo'})
-      .populate({path: 'userFrom'})
-      .exec( function (err2, req2) {
-        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
-        if (!req2) return res.status(404).send({message: `la peticio no existeix: ${err2}`});
-        console.log("JUAN", req2);
-        res.status(200).send(req2);
+                   .populate({path: 'activity'})
+                   .populate({path: 'userTo'})
+                   .exec( function (err2, req2) {
+                        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
+                        if (!req2) return res.status(404).send({message: `la peticio no existeix: ${err2}`});
+
+                    res.status(200).send(req2);
     })
 };
 
 //llista paginada dels usuaris que m'han fet una peticio
 exports.getPetitions = function (req, res) {
-    let userId = req.params.id;
-    console.log(userId);
-    let page = 1;
-    let itemsPage = 4;
+    let userId = req.params.id
+
     ActivityRequest.find({userTo: userId})
-    //ActivityRequest.find({"_id": "5addb98090114b1df49e3930"})
-      .populate('userFrom')
-      .populate('userTo')
-      .populate('activity')
-      .exec(function (err2, req2 ){
-        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
-        if (!req2) return res.status(404).send({message: `no tens cap peticio: ${err2}`});
-        console.log("PEPITO", req2);
-        res.status(200).send(req2);
+                   .populate('userFrom')
+                   .populate('userTo')
+                   .populate('activity')
+                   .exec(function (err2, req2 ){
+                        if (err2)  return res.status(500).send({message: `error al realitzar la petició: ${err2}`});
+                        if (!req2) return res.status(404).send({message: `no tens cap peticio: ${err2}`});
+
+                       res.status(200).send(req2);
     })
+    
 };
 
 //contadors
