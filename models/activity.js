@@ -7,7 +7,7 @@ let ActivitySchema = new mongoose.Schema(
         latitude:       { type: Number},
         longitude:      { type: Number},
         cost:           { type: Number},
-        user:           { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        user:           { type: String },
         description:    { type: String},
         tags    :       { type: [ String ] },
         category:       { type: [ String]},

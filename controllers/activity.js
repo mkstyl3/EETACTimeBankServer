@@ -33,7 +33,10 @@ exports.insertActivity = function (req, res) {
             return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
         }else{
             console.log(req.body);
-            User.findOne({_id:req.body.user},{__v: false},function(err,user){
+            User.findOne({username:req.body.user},{__v: false},function(err,user){
+                if(err){
+                    return res.status(202).send({'result': 'ERROR'});
+                }
                 if(user.offered!=null)
                 {
                     user.offered.push(activity._id);
