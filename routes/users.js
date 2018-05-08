@@ -10,14 +10,15 @@ router.route('/signup').post(validateBody(schemas.signUp), user.signUp);
 router.route('/signin').post(validateBody(schemas.signIn),
     passport.authenticate('local', { session: false }), user.signIn);
 
-router.get('/', user.selectAllUsers);             // Devuelve una lista con todos los usuarios
-router.get('/:name', user.selectOneUser);         // Devuelve el usuario buscado
-//router.post('/', user.insertUser);              // Inserta un nuevo usuario (username único)
-router.put('/:name', user.updateUser);            // Actualiza la información de un usuario
-router.delete('/:name', user.deleteUser);         // Elimina de la Base de Datos el usuario buscado
-router.post('/getUserById', user.getUserById);    // Devuelve un usuario por su id que es unica
+router.get('/', passport.authenticate('jwt', { session: false }), user.selectAllUsers);             // Devuelve una lista con todos los usuarios
+router.get('/:name', passport.authenticate('jwt', { session: false }), user.selectOneUser);         // Devuelve el usuario buscado
+//router.post('/', user.insertUser);                                                                // Inserta un nuevo usuario (username único)
+router.put('/:name', passport.authenticate('jwt', { session: false }), user.updateUser);            // Actualiza la información de un usuario
+router.delete('/:name', passport.authenticate('jwt', { session: false }), user.deleteUser);         // Elimina de la Base de Datos el usuario buscado
+router.post('/getUserById', passport.authenticate('jwt', { session: false }), user.getUserById);    // Devuelve un usuario por su id que es unica
 
 
 //Put this in Header data key: 'Authorization', value: token (in session storage)
 
 module.exports = router;
+//updateActivity
