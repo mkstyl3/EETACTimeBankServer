@@ -1,7 +1,7 @@
 const User = require('../../EETACTimeBankServer/models/user');
 const JWT = require('jsonwebtoken'); 
 const { JWT_SECRET } = require('../configs/keys');
-var nodemailer = require('nodemailer');
+let nodemailer = require('nodemailer');
 
 //try-catch blocks are implicit thanks to the express-promise-router lib from routes.users.js//
 signToken = user => {
@@ -43,21 +43,21 @@ module.exports = {
         //respond with a token
 
         //enviamos un mail al nuevousuario
-        var transporter = nodemailer.createTransport({
+        let transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
                 user: 'eetac.ea@gmail.com',
                 pass: 'eetac123'
             }
         });
-// Definimos el email
-        var mailOptions = {
+        // Definimos el email
+        let mailOptions = {
             from: 'eetac.ea@gmail.com',
             to: req.body.mail,
             subject: 'Bienvenido al banco de tiempo!',
-            text: 'Bienvenido anuestra app señor ' + req.body.username
+            text: 'Bienvenido a nuestra app señor ' + req.body.name
         };
-// Enviamos el email
+        // Enviamos el email
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
