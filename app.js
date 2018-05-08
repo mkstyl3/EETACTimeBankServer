@@ -41,4 +41,8 @@ MongoDB.connect();
 server.listen(8880);
 chat.chat(io);
 
+process.on('SIGINT', function() {
+    process.exit();
+});
+
 module.exports = app;
