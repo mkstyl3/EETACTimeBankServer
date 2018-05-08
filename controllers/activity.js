@@ -1,4 +1,5 @@
 const Activity = require('../../EETACTimeBankServer/models/activity');
+const User = require('../../EETACTimeBankServer/models/user');
 
 // Devuelve una lista con todas las actividades
 exports.selectAllActivities = function (req, res) {
@@ -26,11 +27,23 @@ exports.selectOneActivity = function (req, res) {
 
 // Inserta una nueva actividad
 exports.insertActivity = function (req, res) {
-    Activity(req.body).save(function (err) {
+    Activity(req.body).save(function (err,activity) {
         if(err){
             console.log(err);
             return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
         }else{
+            console.log(req.body);
+            User.findOne({_id:req.body.user},{__v: false},function(err,user){
+                if(user.offered!=null)
+                {
+                    user.offered.push(activity._id);
+                    user.save();
+                }
+                else{
+                    user.offered =[activity._id]
+                    user.save();
+                }
+            })
             return res.status(201).send({'result': 'INSERTADO'}); // Devuelve un JSON
         }
     });
