@@ -72,3 +72,18 @@ exports.deleteActivity = function (req, res) {
         }
     });
 };
+
+//populate
+
+exports.populateActivities = function (req, res) {
+    Activity.find({})
+        .populate('user')
+        .exec(function (err, activities) {
+        if(err){
+            console.log(err);
+            return res.status(500).send({'result': 'ERROR'});
+        }else{
+            return res.status(200).send(activities);
+        }
+    })
+};
