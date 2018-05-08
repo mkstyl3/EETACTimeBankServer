@@ -32,8 +32,9 @@ module.exports = {
         //Check if there is a user with the same username
         const foundUser = await User.findOne({ username: req.value.body.username });
         if(foundUser) {
-            return res.status(403).json({ error : 'This username is already in use'})
+            return res.status(403).json({ dbError : 'Duplicated'})
         }
+
 
         const newUser = new User(req.value.body);
         let user = await newUser.save();
