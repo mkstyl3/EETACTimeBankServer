@@ -130,7 +130,7 @@ module.exports = {
   getUserById: async (req, res) => {
     User.findOne({ _id: req.body.id }, { __v: false })
       .populate('offered',{ __v: false }).populate('received', { __v: false })
-      .exec( function (err, user) {
+      .exec(function (err, user) {
           if(err) {
             console.log(err);
             return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON

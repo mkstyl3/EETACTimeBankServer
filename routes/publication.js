@@ -9,6 +9,4 @@ const md_upload    = multipart({uploadDir: '../uploads/publications'});
 router.post      ('/', passport.authenticate('jwt', { session: false }),         publication.savePublication);
 router.get       ('/:page?', passport.authenticate('jwt', { session: false }),   publication.getPublications);
 
-
-
 module.exports = router;

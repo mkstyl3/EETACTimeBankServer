@@ -10,7 +10,6 @@ router.get      ('/requested/:id',    passport.authenticate('jwt', { session: fa
 router.get      ('/petitions/:id',    passport.authenticate('jwt', { session: false }), activityRequest.getPetitions);
 router.get      ('/count/:id',        passport.authenticate('jwt', { session: false }), activityRequest.getCounters);
 
-
 router.get      ('/:id', passport.authenticate('jwt', { session: false }), activityRequest.getRequest);
 router.post     ('/',    passport.authenticate('jwt', { session: false }), activityRequest.insertActivityRequest);
 router.put      ('/:id', passport.authenticate('jwt', { session: false }), activityRequest.updateRequest);
