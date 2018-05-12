@@ -2,6 +2,7 @@ const User = require('../../EETACTimeBankServer/models/user');
 const JWT = require('jsonwebtoken'); 
 const { JWT_SECRET } = require('../configs/keys');
 let nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 //try-catch blocks are implicit thanks to the express-promise-router lib from routes.users.js//
 signToken = user => {
