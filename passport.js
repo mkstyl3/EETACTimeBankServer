@@ -31,15 +31,18 @@ passport.use(new LocalStrategy({
     usernameField: 'username'
 }, async (username, password, done) => {
     try {
+        //console.log('fas local strategy? '+ username);
+        //console.log({'username':username});
         // Find the user based on username
-        const user = await User.findOne({ username });
+        const user = await User.findOne({'username':username});
+        //console.log(user);
         //If not, handle it
         if(!user) {
             return done(null, false);
         }
         // Check if password is correct
         const isMatch = await user.isValidPassword(password);
-
+        //console.log('compares? '+isMatch);
         // If not, handle it
         if (!isMatch) {
             return done(null, false);

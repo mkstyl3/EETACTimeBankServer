@@ -36,9 +36,10 @@ module.exports = {
             return res.status(403).json({ dbError : 'Duplicated'})
         }
 
-
+        //console.log(req.value.body);
         const newUser = new User(req.value.body);
         let user = await newUser.save();
+        //console.log('final hash es: '+user.password);
         let userId = user.id;
         // Generate the token
         const token = signToken(newUser);
