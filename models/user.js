@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema(
         numVal:      { type: Number, default: 0 },
         offered:     [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
         received:    [ { type: mongoose.Schema.Types.ObjectId, ref: 'Activity' } ],
-        admin:       { type: Boolean }
+        admin:       { type: Boolean },
+        firstSave:   { type: Boolean }
     }
 );
 
@@ -24,10 +25,15 @@ userSchema.pre('save', async function (next) {
     try {
         //console.log('save password es: '+this.password);
         // Generate a salt
-        const salt = await bcrypt.genSalt(10);
-        // Generate a password hash (salt + hash)
-        const passwordHash = await bcrypt.hash(this.password, salt);
-        this.password = passwordHash;
+        console.log('save: '+this.firstSave);
+        if(this.firstSave==undefined)
+        {
+            const salt = await bcrypt.genSalt(10);
+            // Generate a password hash (salt + hash)
+            const passwordHash = await bcrypt.hash(this.password, salt);
+            this.password = passwordHash;
+            this.firstSave = false;
+        }
         //console.log('save password hash es: '+passwordHash);
         next();
     } catch (error) {
