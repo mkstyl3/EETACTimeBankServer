@@ -80,7 +80,7 @@ exports.deleteActivity = function (req, res) {
 
 exports.populateActivities = function (req, res) {
     Activity.find({})
-        .populate('user')
+        /*.populate('user')*/
         .exec(function (err, activities) {
         if(err){
             console.log(err);
