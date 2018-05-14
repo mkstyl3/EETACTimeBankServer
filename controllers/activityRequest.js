@@ -130,6 +130,32 @@ exports.getPetitions = function (req, res) {
     
 };
 
+exports.acceptRequest = async function (req,res){
+    console.log(req.body);
+    let request = await ActivityRequest.findOne({'_id':req.body.id});
+    if(request){
+        request.accepted = true;
+        request.save();
+        res.status(200).send({'message':'ok'});
+    }
+    else{
+        res.status(404).send({'message':'peticion no encontrada'});
+    }
+} 
+
+exports.doneRequest = async function (req,res){
+    console.log(req.body);
+    let request = await ActivityRequest.findOne({'_id':req.body.id});
+    if(request){
+        request.isDone = true;
+        request.save();
+        res.status(200).send({'message':'ok'});
+    }
+    else{
+        res.status(404).send({'message':'peticion no encontrada'});
+    }
+} 
+
 //contadors
 exports.getCounters = function (req, res) {
     let id = req.params.id
