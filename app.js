@@ -35,6 +35,18 @@ app.use('/chats',           require('./routes/chats'));
 app.use('/activityRequest', require('./routes/activityRequest'));
 app.use('/publications',    require('./routes/publication'));
 
+app.use(function(req, res, next)
+{
+    /* Allow access from any requesting client */
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    /* Allow access for any of the following Http request types */
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT');
+
+    /* Set the Http request header */
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
+    next();
+});
 // Mongoose
 MongoDB.connect();
 //chat connections
