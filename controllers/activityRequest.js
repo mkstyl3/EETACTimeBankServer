@@ -49,6 +49,29 @@ exports.insertActivityRequest = function (req, res) {
     })
 };
 
+exports.insertActivityRequestFromName = async function (req, res) {
+    console.log(req.bodyParser)
+    let userFrom = await User.findOne({'username':req.body.userFrom});
+    let userTo = await User.findOne({'username':req.body.userTo});
+
+    if(!userTo&&!userFrom)
+    {
+        res.status(200).send({message:`error en salvar la BD: no existen los usuarios`});
+        return;
+    }
+
+    let activityRequest = new ActivityRequest()
+        activityRequest.userFrom    = userFrom.id;
+        activityRequest.userTo      = userTo.id;
+        activityRequest.activity      = req.body.activity;
+    
+    
+    activityRequest.save((err, requestStored) => {
+        if(err) res.status(200).send({message:`error en salvar la BD: ${err}`})
+        res.status(200).send({activityRequest: requestStored})
+    })
+};
+
 // Actualiza la información de una petició
 exports.updateRequest = function (req, res) {
     let requestId = req.params.requestId
