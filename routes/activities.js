@@ -3,7 +3,6 @@ const activity = require('../controllers/activity');
 const passport = require('passport');
 
 // Funciones sobre Actividadesç
-router.get('/novetats', passport.authenticate('jwt', { session: false }), activity.populateActivities);
 router.get('/', passport.authenticate('jwt', { session: false }), activity.selectAllActivities);  // Devuelve una lista con todas las actividades
 router.get('/:id', passport.authenticate('jwt', { session: false }), activity.selectOneActivity); // Devuelve las actividad buscada
 router.post('/', passport.authenticate('jwt', { session: false }), activity.insertActivity);      // Inserta una nueva actividad
