@@ -19,21 +19,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // Configurations
-app.use(cors());
-// ExpressJS will parse the request before it got routed
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
+//app.use(cors());
 
-//Routes
-app.use('/users',           require('./routes/users'));
-app.use('/activities',      require('./routes/activities'));
-app.use('/chats',           require('./routes/chats'));
-app.use('/activityRequest', require('./routes/activityRequest'));
-app.use('/publications',    require('./routes/publication'));
 
 app.use(function(req, res, next)
 {
@@ -60,6 +47,25 @@ app.use(async (req,res,next) =>
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
     next();
 });
+
+
+
+// ExpressJS will parse the request before it got routed
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
+
+//Routes
+app.use('/users',           require('./routes/users'));
+app.use('/activities',      require('./routes/activities'));
+app.use('/chats',           require('./routes/chats'));
+app.use('/activityRequest', require('./routes/activityRequest'));
+app.use('/publications',    require('./routes/publication'));
+
+
 // Mongoose
 MongoDB.connect();
 //chat connections
