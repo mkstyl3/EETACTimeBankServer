@@ -2,6 +2,8 @@ const HashMap = require('hashmap');
 const Chat = require('./models/chat')
 const User = require('./models/user')
 const boom = require('boom');
+let socket;
+exports.socket = socket;
 
 exports.chat = function (io) {
     let usersHashMap = new HashMap();
@@ -10,6 +12,7 @@ exports.chat = function (io) {
         console.log("user connected");
         var user = null;
 
+        this.socket = socket;
 
         socket.on('init', function (msg) {
             user = msg.userFrom;
