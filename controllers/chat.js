@@ -71,38 +71,43 @@ exports.getUserChats = function (req, res) {
         return res.status(200).send(chatsTosend);
 
     })
-
-
 };
 
+
 exports.addChatToUsers = function (req, res) {
-    console.log('chats/addChat');
-    User.findOne({'username':req.body.user1}, ( err,user)=>{
-        if (err) return res.send(boom.badRequest());
-        var user1T = user;
-        //console.log(req.body.user1);
-        //console.log(user);
-        User.findOne({'username':req.body.user2}, ( err,user)=>{
+    const { user1, user2 } = req.body;
+    Chat.searchByUsers({ user1, user2 }, (err, chat) => {
+        if(chat) {
+            return res.send({status:'ok', chatId: chat._id});
+        }
+
+        User.findOne({'username':req.body.user1}, ( err,user)=>{
             if (err) return res.send(boom.badRequest());
-            var user2T = user;
-            //console.log(req.body.user2);
-            //console.log(user);
+            const user1T = user;
+            User.findOne({'username':req.body.user2}, ( err,user)=> {
+                if (err) return res.send(boom.badRequest());
 
-            var newChat = {};
-            var user1= {};
-            var user2= {};
-            user1["userId"] = user1T.id;
-            user1["userName"] = user1T.username;
-            user1["userAvatar"] = "";
-            user2["userId"] = user2T.id;
-            user2["userName"] = user2T.username;
-            user2["userAvatar"] = "";
-            newChat["users"] = [user1,user2];
-            newChat["messages"] = [];
-            var chat = new Chat(newChat);
-            chat.save();
-            return res.send({status:'ok'});
+                const user2T = user;
+                //console.log(req.body.user2);
+                //console.log(user);
 
+                const newChat = {};
+                const user1= {};
+                const user2= {};
+                user1["userId"] = user1T.id;
+                user1["userName"] = user1T.username;
+                user1["userAvatar"] = user1T.image;
+                user2["userId"] = user2T.id;
+                user2["userName"] = user2T.username;
+                user2["userAvatar"] = user2T.image;
+                newChat["users"] = [user1,user2];
+                newChat["messages"] = [];
+                const chat = new Chat(newChat);
+
+                Chat.create(chat, (err, chat) => {
+                    return res.send({status:'ok', chatId: chat._id});
+                });
+            });
         });
     });
 };

@@ -64,7 +64,7 @@ module.exports = {
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
-                res.send(500, err.message);
+                res.send(500, error.message);
             }
         });
         res.status(200).json({ token, userId });
