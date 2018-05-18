@@ -95,8 +95,16 @@ module.exports = function(io)
             }
         });
     };
+
+    func.deleteActivity = function (req, res) {
+        Activity.remove({ _id: req.params.id }, function(err) {
+            if(err){
+                console.log(err);
+                return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
+            }else{
+                return res.status(200).send({'result': 'ELIMINADO'}); // Devuelve un JSON
+            }
+        });
+    }
     return func;
 }
-
-
-// Devuelve una lista con todas las actividades

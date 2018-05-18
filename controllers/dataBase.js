@@ -1,8 +1,21 @@
 const uri = require('../configs/db');
 const mongoose = require('mongoose');
+const User = require('../models/user');
 /** Object to interact with database connection */
 const Database = {
-    connect: () => mongoose.connect(uri),
+    connect: async function (){
+        await mongoose.connect(uri);
+        /*netejo els sockets guardats a la base de dades al inicar el servidor*/
+        let users = await User.find({});
+        if(users)
+        {
+            for(let i=0;i<users.length;i++)
+            {
+                users[i].socketId = [];
+                users[i].save();
+            }
+        }
+    },
 };
 /** Connection events */
 // When successfully connected

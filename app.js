@@ -19,36 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // Configurations
-//app.use(cors());
-
-
-app.use(function(req, res, next)
-{
-    /* Allow access from any requesting client */
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    /* Allow access for any of the following Http request types */
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT');
-
-    /* Set the Http request header */
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
-    next();
-});
-
-app.use(async (req,res,next) =>
-{
-    /* Allow access from any requesting client */
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    /* Allow access for any of the following Http request types */
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT');
-
-    /* Set the Http request header */
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
-    next();
-});
-
-
+app.use(cors());
 
 // ExpressJS will parse the request before it got routed
 app.use(logger('dev'));
@@ -62,7 +33,7 @@ app.use(bodyParser.json());
 app.use('/users',           require('./routes/users'));
 app.use('/activities',      require('./routes/activities')(io));
 app.use('/chats',           require('./routes/chats'));
-app.use('/activityRequest', require('./routes/activityRequest'));
+app.use('/activityRequest', require('./routes/activityRequest')(io));
 app.use('/publications',    require('./routes/publication'));
 
 

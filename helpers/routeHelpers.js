@@ -12,21 +12,19 @@ module.exports = {
             if (!req.value) { req.value = {}; }
             req.value['body'] = result.value;   
             next();
-
-            // req.value.body instead req.body
         }
     },
 
     schemas: {
-        signUp: Joi.object().keys({ 
-            mail: Joi.string().email().required(),
-            password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
-            username: Joi.string().alphanum().min(3).max(30).required(),
+        signUp: Joi.object().keys({
             name: Joi.string().alphanum().min(3).max(30).required(),
+            username: Joi.string().alphanum().min(3).max(30).required(),
+            password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
+            mail: Joi.string().email().required()
         }),
         signIn: Joi.object().keys({
-            password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
             username: Joi.string().alphanum().min(3).max(30).required(),
+            password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()
         }),
         updateActivity: Joi.object().keys({ 
             name: Joi.string().required(),
@@ -35,4 +33,4 @@ module.exports = {
             tag: Joi.array().required()
         }),
     }
-}
+};
