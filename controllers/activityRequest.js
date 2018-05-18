@@ -189,13 +189,13 @@ module.exports = function (io) {
         if (request) {
             request.isDone = true;
             request.save();
+            let activity = await Activity.findById(request.activity);
             let userTo = await User.findById(request.userTo);
             userTo.wallet = userTo.wallet + activity.cost;
             userTo.save();
             let userFrom = await User.findOne({'_id':request.userFrom});
             userFrom.wallet = userFrom.wallet - activity.cost;
             userFrom.save()
-            let activity = await Activity.findById(request.activity);
             if (userTo && activity) {
                 for (var i = 0; i < userTo.socketId.length; i++) {
                     io.to(userTo.socketId[i]).emit('notification',
