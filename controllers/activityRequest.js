@@ -192,6 +192,8 @@ module.exports = function (io) {
             let activity = await Activity.findById(request.activity);
             let userTo = await User.findById(request.userTo);
             userTo.wallet = userTo.wallet + activity.cost;
+            userTo.rating = (userTo.rating*userTo.numVal+req.body.rate)/(userTo.numVal+1);
+            userTo.numVal = userTo.numVal + 1;
             userTo.save();
             let userFrom = await User.findOne({'_id':request.userFrom});
             userFrom.wallet = userFrom.wallet - activity.cost;
