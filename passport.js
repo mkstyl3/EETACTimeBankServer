@@ -2,8 +2,21 @@ const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 const LocalStrategy = require('passport-local').Strategy;
-const { JWT_SECRET } = require('./configs/keys');
+const GooglePlusTokenStrategy = require('passport-google-plus-token');
+const { JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = require('./configs/keys');
+
 const User = require('./models/user');
+
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+// used to deserialize the user
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });
+});
 
 //JSON WEB TOKENS STRATEGY
 passport.use(new JwtStrategy({
@@ -53,3 +66,46 @@ passport.use(new LocalStrategy({
         done(error, false);
     }
 })); 
+
+// GOOGLE OAUTH STRATEGY
+
+passport.use('googleToken', new GooglePlusTokenStrategy({
+    clientID:     GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    //NOTE :
+    //Carefull ! and avoid usage of Private IP, otherwise you will get the device_id device_name issue for Private IP during authentication
+    //The workaround is to set up thru the google cloud console a fully qualified domain name such as http://mydomain:3000/ 
+    //then edit your /etc/hosts local file to point on your private IP. 
+    //Also both sign-in button + callbackURL has to be share the same url, otherwise two cookies will be created and lead to lost your session
+    //if you use it.
+    
+  }, async (accessToken, refreshToken, profile, done) => {
+      try {
+        console.log('accessToken', accessToken);
+        console.log('profile', profile);
+        console.log('refreshToken', refreshToken);
+    
+        // Check whether this current user exist in our DB
+        const existingUser = await User.findOne({ "username" : profile.id });
+        if (existingUser) {
+            console.log('User already exists in our database')
+            return done(null, existingUser);
+        }
+        
+        console.log('User doesn\'t exist, let\'s create a new one');
+        // If new account
+        const newUser = new User ({
+            socialId: profile.id,
+            name: profile.displayName,
+            username: profile.id, 
+            mail: profile.emails[0].value
+        });
+    
+        await newUser.save();
+        done(null, newUser);
+      } catch(error) {
+            done(error, false, error.message); 
+      }
+}));
+  
+  

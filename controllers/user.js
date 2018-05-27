@@ -1,8 +1,29 @@
 const User = require('../../EETACTimeBankServer/models/user');
 const JWT = require('jsonwebtoken'); 
-const { JWT_SECRET } = require('../configs/keys');
+const { JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL } = require('../configs/keys');
 let nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const { google } = require('googleapis'); 
+const passport = require('passport');
+const oauth2Client = new google.auth.OAuth2(
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URL,
+  );
+
+// generate a url that asks permissions for Google+ and Google Calendar scopes
+const scopes = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+];
+   
+const url = oauth2Client.generateAuthUrl({
+    // 'online' (default) or 'offline' (gets refresh_token)
+    access_type: 'offline',
+   
+    // If you only need one scope you can pass it as a string
+    scope: scopes
+});
 
 //try-catch blocks are implicit thanks to the express-promise-router lib from routes.users.js//
 signToken = user => {
@@ -70,6 +91,35 @@ module.exports = {
         res.status(200).json({ token, userId });
         //res.json(user);
 
+    },
+
+    googleOauth: async (req, res, next) => {
+        //Generate token 
+        const user = req.user;
+        console.log('user', user);
+        const token = signToken(user);
+        res.status(200).json({
+            'username': user.username,
+            'googleToken': req.body.access_token,
+            'token': token,
+            'userId': user.id
+        });
+    },
+    googleCodeExchange: async (req, res, next) => {
+        //Generate token 
+        console.log('lol!');
+        //const profile = req.body.profile;
+        const { tokens } = await oauth2Client.getToken(req.body.code);
+        oauth2Client.setCredentials(tokens);
+        
+        
+        console.log(tokens);
+        // const token = signToken(req.user);
+        res.status(200).json( tokens ); // Pass only the token we want
+    },
+
+    googleOauthCallback: async (req, res, next) => { // Not used
+        console.log('Callback is alive!');
     },
 
     secret: async (req, res, next) => {
@@ -142,5 +192,6 @@ module.exports = {
         }
       );
   }
-};
 
+  
+};

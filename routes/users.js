@@ -17,8 +17,16 @@ router.put('/:name', passport.authenticate('jwt', { session: false }), user.upda
 router.delete('/:name', passport.authenticate('jwt', { session: false }), user.deleteUser);         // Elimina de la Base de Datos el usuario buscado
 router.post('/getUserById', passport.authenticate('jwt', { session: false }), user.getUserById);    // Devuelve un usuario por su id que es unica
 
+router.route('/oauth/google/token')
+    .post(passport.authenticate('googleToken', { session: false }), user.googleOauth);
 
-//Put this in Header data key: 'Authorization', value: token (in session storage)
+router.route('/oauth/google/callback') // Not used
+    .post(user.googleOauthCallback);
+
+router.route('/oauth/google/code')
+    .post(user.googleCodeExchange);
+
+
+
 
 module.exports = router;
-//updateActivity

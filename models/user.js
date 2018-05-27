@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema(
     {
+        socialId:    { type: String },
         username:    { type: String, required: true, unique: true },  // Campo obligatório para insertar
-        password:    { type: String, required: true },                // Campo obligatório para insertar
+        password:    { type: String },                // Campo obligatório para insertar
         name:        { type: String, required: true },                // Campo obligatório para insertar
         mail:        { type: String, required: true },                // Campo obligatório para insertar
         description: { type: String },
@@ -24,6 +25,9 @@ const userSchema = new mongoose.Schema(
 userSchema.pre('save', async function (next) {
     try {
         //console.log('save password es: '+this.password);
+        if (this.socialId != null) {
+            return next();
+        }
         // Generate a salt
         console.log('save: '+this.firstSave);
         if(this.firstSave==undefined)
