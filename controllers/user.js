@@ -178,6 +178,7 @@ module.exports = {
         });
     },
 
+
   // Devuelve un usuario por su id
   getUserById: async (req, res) => {
     User.findOne({ _id: req.body.id }, { __v: false })

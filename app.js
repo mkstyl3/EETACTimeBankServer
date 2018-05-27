@@ -11,6 +11,7 @@ const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 const chat = require('./chat');
 const MongoDB =require('./controllers/dataBase');
+const fileUpload = require('express-fileupload');
 
 //////////////////////// Middlewares ///////////////////////////////
 
@@ -27,6 +28,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+<<<<<<< HEAD
+=======
+app.use(bodyParser.json());
+app.use(fileUpload());
+>>>>>>> b835dbeab5a892eef9b0bd962abcf1ce5c5cd497
 
 //Routes
 app.use('/users',           require('./routes/users'));
@@ -34,6 +40,7 @@ app.use('/activities',      require('./routes/activities')(io));
 app.use('/chats',           require('./routes/chats'));
 app.use('/activityRequest', require('./routes/activityRequest')(io));
 app.use('/publications',    require('./routes/publication'));
+app.use('/files',    require('./routes/file'));
 
 
 // Mongoose
