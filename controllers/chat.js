@@ -1,7 +1,8 @@
 const boom = require('boom');
 const Chat = require('../models/chat');
-const User = require('../models/user')
-/*RETURN A PARTICULAR CHAT BY THE ID*/
+const User = require('../models/user');
+const ChatController = require('../chat');
+/*RETURN A PARTICULAR CHAT BY THE ID ARREGLAR*/
 exports.getChat = function (req, res) {
     if (req.params.id) {
         Chat.findById(req.params.id, (err, chat) => {
@@ -16,7 +17,6 @@ exports.getChat = function (req, res) {
             }
             while(i<chat.messages.length);
             chat.save();
-            console.log('this is the chat' +chat);
             res.status(200).send(chat);
         });
     }
@@ -34,7 +34,7 @@ exports.saveTestChat = function (req, res) {
             return res.status(200).send(chat); // Devuelve un JSON
         }
     });
-}
+};
 
 exports.getUserChats = function (req, res) {
     const chatsTosend = [];
@@ -67,7 +67,6 @@ exports.getUserChats = function (req, res) {
             else
             chatsTosend.push({'id':id, 'userId': userFound[0].userId,'userName':userFound[0].userName,'userAvatar':userFound[0].userAvatar, 'lastMessage':'', 'newMessages': newMessages});
         }
-        console.log(chatsTosend);
         return res.status(200).send(chatsTosend);
 
     })
@@ -76,7 +75,7 @@ exports.getUserChats = function (req, res) {
 
 exports.addChatToUsers = function (req, res) {
     const { user1, user2 } = req.body;
-    Chat.searchByUsers({ user1, user2 }, (err, chat) => {
+    Chat.searchByUsers({ user1, user2 }, (err, chat) => { //=>user1 must to be he owner
         if(chat) {
             return res.send({status:'ok', chatId: chat._id});
         }
@@ -86,11 +85,8 @@ exports.addChatToUsers = function (req, res) {
             const user1T = user;
             User.findOne({'username':req.body.user2}, ( err,user)=> {
                 if (err) return res.send(boom.badRequest());
-
+                if(user2){
                 const user2T = user;
-                //console.log(req.body.user2);
-                //console.log(user);
-
                 const newChat = {};
                 const user1= {};
                 const user2= {};
@@ -103,10 +99,24 @@ exports.addChatToUsers = function (req, res) {
                 newChat["users"] = [user1,user2];
                 newChat["messages"] = [];
                 const chat = new Chat(newChat);
-
                 Chat.create(chat, (err, chat) => {
+                    /*THIS POINT SEND THE NEW CHAT TO USERS VIA SOCKET??*/
+                    if(chat){
+                    const chatToSend = {'id':chat._id,'userId':user2T.id,'userName':user2T.username,'userAvatar':user2T.image,'lastMessage':'','newMessages':0};
+                    const sockets = ChatController.Sockets;
+                    if(sockets){
+                        if(sockets.has(user2T.id)){
+                            const privateSockets = sockets.get(user2T.id);
+                            privateSockets.forEach(function(valor){
+                                console.log("l'usuari està connectat i li enviem el xat");
+                                valor.emit("newChat",chatToSend);
+                            });
+
+                        }
+                    }
                     return res.send({status:'ok', chatId: chat._id});
-                });
+                    }
+                });}
             });
         });
     });
