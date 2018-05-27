@@ -1,5 +1,5 @@
 const User = require('../../EETACTimeBankServer/models/user');
-const JWT = require('jsonwebtoken'); 
+const JWT = require('jsonwebtoken');
 const { JWT_SECRET } = require('../configs/keys');
 let nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -127,6 +127,7 @@ module.exports = {
             }
         });
     },
+
 
   // Devuelve un usuario por su id
   getUserById: async (req, res) => {

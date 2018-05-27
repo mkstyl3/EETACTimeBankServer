@@ -18,6 +18,8 @@ router.delete('/:name', passport.authenticate('jwt', { session: false }), user.d
 router.post('/getUserById', passport.authenticate('jwt', { session: false }), user.getUserById);    // Devuelve un usuario por su id que es unica
 
 
+
+
 //Put this in Header data key: 'Authorization', value: token (in session storage)
 
 module.exports = router;
