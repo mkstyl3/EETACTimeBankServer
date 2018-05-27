@@ -28,11 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-<<<<<<< HEAD
-=======
-app.use(bodyParser.json());
 app.use(fileUpload());
->>>>>>> b835dbeab5a892eef9b0bd962abcf1ce5c5cd497
 
 //Routes
 app.use('/users',           require('./routes/users'));
