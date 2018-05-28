@@ -20,13 +20,8 @@ router.post('/getUserById', passport.authenticate('jwt', { session: false }), us
 router.route('/oauth/google/token')
     .post(passport.authenticate('googleToken', { session: false }), user.googleOauth);
 
-router.route('/oauth/google/callback') // Not used
-    .post(user.googleOauthCallback);
+router.route('/oauth/google/callback').post(user.googleOauthCallback); // Not used
 
-router.route('/oauth/google/code')
-    .post(user.googleCodeExchange);
-
-
-
+router.route('/oauth/google/code').post(user.googleCodeExchange);
 
 module.exports = router;
