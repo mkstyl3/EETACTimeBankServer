@@ -10,8 +10,9 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 const chat = require('./chat');
-const MongoDB =require('./controllers/dataBase');
+const MongoDB = require('./controllers/dataBase');
 const fileUpload = require('express-fileupload');
+var debug = require('debug')('eetactimebankserver:server');
 
 //////////////////////// Middlewares ///////////////////////////////
 
@@ -31,22 +32,58 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
 //Routes
-app.use('/users',           require('./routes/users'));
-app.use('/activities',      require('./routes/activities')(io));
-app.use('/chats',           require('./routes/chats'));
+app.use('/users', require('./routes/users'));
+app.use('/activities', require('./routes/activities')(io));
+app.use('/chats', require('./routes/chats'));
 app.use('/activityRequest', require('./routes/activityRequest')(io));
-app.use('/publications',    require('./routes/publication'));
-app.use('/files',    require('./routes/file'));
+app.use('/publications', require('./routes/publication'));
+app.use('/files', require('./routes/file'));
 
 
 // Mongoose
 MongoDB.connect();
-//chat connections
-server.listen(8880);
 chat.chat(io);
 
-process.on('SIGINT', function() {
+process.on('SIGINT', function () {
     process.exit();
 });
 
-module.exports = app;
+server.listen(3000);
+server.on('error', onError);
+server.on('listening', onListening);
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
