@@ -43,7 +43,8 @@ module.exports = {
         res.status(200).json({
             'username': req.user.username,
             'token': token,
-            'userId': req.user.id
+            'userId': req.user.id,
+            'foto':req.user.image
         });
     },
 
