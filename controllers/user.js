@@ -130,7 +130,7 @@ module.exports = {
     // Devuelve una lista con todos los usuarios
     selectAllUsers: async (req, res) => {
         User.find({}, { __v: false })
-            .populate('offered', { __v: false }).populate('received', { __v: false })
+            .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
             .exec( function (err, users) {
                 if (err) {
                     console.log(err);
@@ -143,7 +143,7 @@ module.exports = {
     // Devuelve el usuario buscado
     selectOneUser: async (req, res) => {
         User.findOne({ username: req.params.name }, { __v: false })
-            .populate('offered',{ __v: false }).populate('received', { __v: false })
+            .populate('offered',{ __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
             .exec( function (err, user) {
                 if(err) {
                     console.log(err);
@@ -178,21 +178,17 @@ module.exports = {
         });
     },
 
-
-  // Devuelve un usuario por su id
-  getUserById: async (req, res) => {
-    User.findOne({ _id: req.body.id }, { __v: false })
-      .populate('offered',{ __v: false }).populate('received', { __v: false })
-      .exec(function (err, user) {
+    // Devuelve un usuario por su id
+    getUserById: async (req, res) => {
+        User.findOne({ _id: req.body.id }, { __v: false })
+        .populate('offered',{ __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+        .exec(function (err, user) {
           if(err) {
             console.log(err);
             return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
           }else{
             return res.status(200).send(user);                 // Devuelve un JSON
           }
-        }
-      );
-  }
-
-  
+        });
+    }
 };
