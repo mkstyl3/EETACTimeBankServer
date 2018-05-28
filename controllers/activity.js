@@ -106,5 +106,20 @@ module.exports = function(io)
             }
         });
     }
+    func.filtranombre = function (req, res) {
+        Activity.find({$and:[{$or: [{ name: {$regex : ".*"+req.body.name+".*"} },
+                { tags: {$regex : ".*"+req.body.name+".*"} },{ category: {$regex : ".*"+req.body.name+".*"} } ] }, {cost:{$lt: req.body.cost+1}}]}, { __v: false }, function (err, activity) {
+        //Activity.find({cost:{$lt: req.body.cost}}, { __v: false }, function (err, activity) {
+            if(err){
+                console.log(err);
+                return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+            }else{
+                console.log(activity);
+                return res.status(200).send(activity);             // Devuelve un JSON
+            }
+        });
+        //return res.status(202).send({ 'category' : 'Musica', 'cost' : 1, 'description' : "qwe", 'imatge':'', 'latitude':123, 'longitude':123, 'name': '123', 'user':'juan','tags':{0:"material extra"}});
+    }
+
     return func;
 }
