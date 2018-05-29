@@ -33,6 +33,7 @@
     "nodemailer": "^4.6.4",
     "nodemon": "^1.17.4",
     "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
     "passport-google-authcode": "^0.1.4",
     "passport-google-oauth20": "^1.0.0",
     "passport-google-plus-token": "^2.1.0",
