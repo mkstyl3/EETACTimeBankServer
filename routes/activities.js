@@ -9,5 +9,6 @@ module.exports = function (socket) {
     router.post('/', passport.authenticate('jwt', { session: false }), activity.insertActivity);      // Inserta una nueva actividad
     router.put('/:id', passport.authenticate('jwt', { session: false }), activity.updateActivity);    // Actualiza la información de una actividad
     router.delete('/:id', passport.authenticate('jwt', { session: false }), activity.deleteActivity); // Elimina de la Base de Datos la actividad buscada
+    router.post('/filtranombre', passport.authenticate('jwt', { session: false }), activity.filtranombre);
     return router;
 };

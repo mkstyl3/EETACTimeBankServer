@@ -1,26 +1,26 @@
 const User = require('../../EETACTimeBankServer/models/user');
-const JWT = require('jsonwebtoken'); 
+const JWT = require('jsonwebtoken');
 const { JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL } = require('../configs/keys');
 let nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-const { google } = require('googleapis'); 
+const { google } = require('googleapis');
 const passport = require('passport');
 const oauth2Client = new google.auth.OAuth2(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URL,
-  );
+);
 
 // generate a url that asks permissions for Google+ and Google Calendar scopes
 const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile'
 ];
-   
+
 const url = oauth2Client.generateAuthUrl({
     // 'online' (default) or 'offline' (gets refresh_token)
     access_type: 'offline',
-   
+
     // If you only need one scope you can pass it as a string
     scope: scopes
 });
@@ -31,19 +31,20 @@ signToken = user => {
         iss: 'eetac.upc.ea',
         sub: user.id,
         iat: new Date().getTime(),
-        exp: new Date().setDate(new Date().getDate() +1) // Current time +1 day ahead
+        exp: new Date().setDate(new Date().getDate() + 1) // Current time +1 day ahead
     }, JWT_SECRET);
 };
 
 module.exports = {
     //Función para entrar en el sistema
-    signIn: async (req,res,next) => {
+    signIn: async (req, res, next) => {
         // Generate token
         const token = signToken(req.user);
         res.status(200).json({
             'username': req.user.username,
             'token': token,
-            'userId': req.user.id
+            'userId': req.user.id,
+            'foto': req.user.image
         });
     },
 
@@ -53,8 +54,8 @@ module.exports = {
 
         //Check if there is a user with the same username
         const foundUser = await User.findOne({ username: req.value.body.username });
-        if(foundUser) {
-            return res.status(403).json({ dbError : 'Duplicated'})
+        if (foundUser) {
+            return res.status(403).json({ dbError: 'Duplicated' })
         }
 
         //console.log(req.value.body);
@@ -111,88 +112,98 @@ module.exports = {
         //const profile = req.body.profile;
         const { tokens } = await oauth2Client.getToken(req.body.code);
         oauth2Client.setCredentials(tokens);
-        
-        
+
+
         console.log(tokens);
         // const token = signToken(req.user);
-        res.status(200).json( tokens ); // Pass only the token we want
+        res.status(200).json(tokens); // Pass only the token we want
     },
 
     googleOauthCallback: async (req, res, next) => { // Not used
         console.log('Callback is alive!');
     },
 
+    facebookOauth: async (req, res, next) => {
+        console.log(req);
+    },
+
+    facebookCallback: async (req, res, next) => {
+        console.log(req);
+    },
+
     secret: async (req, res, next) => {
         console.log('I managed to get here!');
-        res.json({ secret: 'resource'});
+        res.json({ secret: 'resource' });
     },
 
     // Devuelve una lista con todos los usuarios
     selectAllUsers: async (req, res) => {
         User.find({}, { __v: false })
-            .populate('offered', { __v: false }).populate('received', { __v: false })
-            .exec( function (err, users) {
+            .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+            .exec(function (err, users) {
                 if (err) {
                     console.log(err);
-                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+                    return res.status(202).send({ 'result': 'ERROR' });  // Devuelve un JSON
                 } else {
                     return res.status(200).send(users);                // Devuelve un JSON
-        }});
+                }
+            });
     },
 
     // Devuelve el usuario buscado
     selectOneUser: async (req, res) => {
         User.findOne({ username: req.params.name }, { __v: false })
-            .populate('offered',{ __v: false }).populate('received', { __v: false })
-            .exec( function (err, user) {
-                if(err) {
+            .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+            .exec(function (err, user) {
+                if (err) {
                     console.log(err);
-                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
-                }else{
+                    return res.status(202).send({ 'result': 'ERROR' });  // Devuelve un JSON
+                } else {
                     return res.status(200).send(user);                 // Devuelve un JSON
                 }
             }
-        );
+            );
     },
 
     // Actualiza la información de un usuario
     updateUser: async (req, res) => {
-        User.update({ username: req.params.name }, req.body, function(err) {
+        User.update({ username: req.params.name }, req.body, function (err) {
             if (err) {
                 console.log(err);
-                return res.status(202).send({'result': 'ERROR'});       // Devuelve un JSON
-        } else{
-            return res.status(200).send({'result': 'ACTUALIZADO'}); // Devuelve un JSON
-        }
-    });},
+                return res.status(202).send({ 'result': 'ERROR' });       // Devuelve un JSON
+            } else {
+                return res.status(200).send({ 'result': 'ACTUALIZADO' }); // Devuelve un JSON
+            }
+        });
+    },
 
     // Elimina de la Base de Datos el usuario buscado
     deleteUser: async (req, res) => {
-        User.remove({ username: req.params.name }, function(err) {
-            if(err){
+        User.remove({ username: req.params.name }, function (err) {
+            if (err) {
                 console.log(err);
-                return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
-            }else{
-                return res.status(200).send({'result': 'ELIMINADO'}); // Devuelve un JSON
+                return res.status(202).send({ 'result': 'ERROR' });     // Devuelve un JSON
+            } else {
+                return res.status(200).send({ 'result': 'ELIMINADO' }); // Devuelve un JSON
             }
         });
     },
 
 
-  // Devuelve un usuario por su id
-  getUserById: async (req, res) => {
-    User.findOne({ _id: req.body.id }, { __v: false })
-      .populate('offered',{ __v: false }).populate('received', { __v: false })
-      .exec(function (err, user) {
-          if(err) {
-            console.log(err);
-            return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
-          }else{
-            return res.status(200).send(user);                 // Devuelve un JSON
-          }
-        }
-      );
-  }
+    // Devuelve un usuario por su id
+    getUserById: async (req, res) => {
+        User.findOne({ _id: req.body.id }, { __v: false })
+            .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+            .exec(function (err, user) {
+                if (err) {
+                    console.log(err);
+                    return res.status(202).send({ 'result': 'ERROR' });  // Devuelve un JSON
+                } else {
+                    return res.status(200).send(user);                 // Devuelve un JSON
+                }
+            }
+            );
+    }
 
-  
+
 };

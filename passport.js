@@ -113,11 +113,12 @@ passport.use('googleToken', new GooglePlusTokenStrategy({
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http://localhost:3000/auth/facebook/callback"
+    callbackURL: "https://backend.bancdetemps.tk/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-      return cb(err, user);
-    });
+    console.log(accessToken);
+    console.log(refreshToken);
+    console.log(profile);
+    console.log(cb);
   }
 ));

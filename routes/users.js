@@ -31,5 +31,4 @@ router.get('/auth/facebook',
 router.route('/oauth/google/callback') // Not used
     .post(user.facebookCallback);
 
-
 module.exports = router;
