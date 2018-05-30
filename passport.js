@@ -120,30 +120,29 @@ passport.use(new FacebookStrategy({
 },
     function (accessToken, refreshToken, profile, cb) {
         console.log('entres?');
-        User.findOne({ "username": profile.id }, (err, userExist) => {
-            if(err) return;
-            if (!userExist) {
-                const newUser = new User({
-                    socialId: profile.id,
-                    socialProvider: 'facebook',
-                    name: profile.displayName,
-                    username: profile.id,
-                    mail: "anonymus@anonymus.anonymus",
-                    password: uuidv4()
-                });
-                newUser.save((errN, userNew) => {
-                    console.log('has guardat?');
-                    cb(errN, userNew);
-                    return;
-                });
-                return;
-            }
-            else {
-                console.log('carregues un usuari?');
-                console.log(userExist);
-                cb(err, userExist);
-                return;
-            }
+        process.nextTick(() => {
+            User.findOne({ "username": profile.id }, (err, userExist) => {
+                if (err) cb(err, null);
+                if (!userExist) {
+                    const newUser = new User({
+                        socialId: profile.id,
+                        socialProvider: 'facebook',
+                        name: profile.displayName,
+                        username: profile.id,
+                        mail: "anonymus@anonymus.anonymus",
+                        password: uuidv4()
+                    });
+                    newUser.save((errN, userNew) => {
+                        console.log('has guardat?');
+                        cb(errN, userNew);
+                    });
+                }
+                else {
+                    console.log('carregues un usuari?');
+                    console.log(userExist);
+                    cb(err, userExist);
+                }
+            })
         })
     }
 ));
