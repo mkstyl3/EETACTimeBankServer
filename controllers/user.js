@@ -130,7 +130,7 @@ module.exports = {
     facebookCallback: async (req, res, next) => {
         console.log('entres al callback?');
         console.log(req);
-        res.status(200).json({'state':'ok'});
+        console.log(res);
     },
 
     secret: async (req, res, next) => {
