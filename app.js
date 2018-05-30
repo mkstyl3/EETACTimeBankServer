@@ -38,7 +38,7 @@ app.use('/chats', require('./routes/chats'));
 app.use('/activityRequest', require('./routes/activityRequest')(io));
 app.use('/publications', require('./routes/publication'));
 app.use('/files', require('./routes/file'));
-
+app.use(passport.initialize());
 
 // Mongoose
 MongoDB.connect();
