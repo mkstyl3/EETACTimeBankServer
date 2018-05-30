@@ -13,6 +13,7 @@ const chat = require('./chat');
 const MongoDB = require('./controllers/dataBase');
 const fileUpload = require('express-fileupload');
 var debug = require('debug')('eetactimebankserver:server');
+const passport = require('passport');
 
 //////////////////////// Middlewares ///////////////////////////////
 
