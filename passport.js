@@ -119,6 +119,7 @@ passport.use(new FacebookStrategy({
     profileFields: ['id', 'displayName', 'picture', 'email']
   },
   async function(accessToken, refreshToken, profile, cb) {
+      console.log('entres?');
       let userExist = User.findOne({ "username" : profile.id });
       if(!userExist){
         const newUser = new User ({
@@ -132,12 +133,18 @@ passport.use(new FacebookStrategy({
 
         try{
            let finalUser = newUser.save();
+           console.log('guardes?');
+           console.log(finalUser);
            cb(undefined,finalUser);
         }catch (err) {
+            console.log('error?');
+            console.log(err);
             cb(err,undefined);
         }
         return;
       } else {
+          console.log('carregues un usuari?');
+          console.log(userExist);
           cb(undefined,userExist);
       }
   }

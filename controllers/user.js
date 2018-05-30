@@ -128,6 +128,7 @@ module.exports = {
     },
 
     facebookCallback: async (req, res, next) => {
+        console.log('entres al callback?');
         console.log(req);
     },
 
