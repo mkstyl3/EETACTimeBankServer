@@ -25,10 +25,10 @@ router.route('/oauth/google/callback') // Not used
 router.route('/oauth/google/code')
     .post(user.googleCodeExchange);
 
-router.get('/auth/facebook',
+router.get('/oauth/facebook',
     passport.authenticate('facebook'),user.facebookOauth);
 
-router.route('/oauth/google/callback') // Not used
+router.route('/oauth/facebook/callback') // Not used
     .post(user.facebookCallback);
 
 module.exports = router;
