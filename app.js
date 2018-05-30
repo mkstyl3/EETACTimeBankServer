@@ -13,6 +13,8 @@ const chat = require('./chat');
 const MongoDB = require('./controllers/dataBase');
 const fileUpload = require('express-fileupload');
 var debug = require('debug')('eetactimebankserver:server');
+const passport = require('passport'); 
+
 
 //////////////////////// Middlewares ///////////////////////////////
 
@@ -30,6 +32,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
+
+app.configure(function() {
+    app.use(passport.initialize());
+});
 
 //Routes
 app.use('/users', require('./routes/users'));
