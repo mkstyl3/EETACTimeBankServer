@@ -13,7 +13,6 @@ const chat = require('./chat');
 const MongoDB = require('./controllers/dataBase');
 const fileUpload = require('express-fileupload');
 var debug = require('debug')('eetactimebankserver:server');
-const passport = require('passport');
 
 //////////////////////// Middlewares ///////////////////////////////
 
@@ -39,7 +38,6 @@ app.use('/chats', require('./routes/chats'));
 app.use('/activityRequest', require('./routes/activityRequest')(io));
 app.use('/publications', require('./routes/publication'));
 app.use('/files', require('./routes/file'));
-app.use(passport.initialize());
 
 // Mongoose
 MongoDB.connect();
