@@ -5,6 +5,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const GooglePlusTokenStrategy = require('passport-google-plus-token');
 const { JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = require('./configs/keys');
+const uuidv4 = require('uuid/v4');
 
 const User = require('./models/user');
 
@@ -98,6 +99,7 @@ passport.use('googleToken', new GooglePlusTokenStrategy({
         // If new account
         const newUser = new User ({
             socialId: profile.id,
+            socialProvider: 'google',
             name: profile.displayName,
             username: profile.id, 
             mail: profile.emails[0].value
@@ -114,16 +116,29 @@ passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: "https://backend.bancdetemps.tk/users/oauth/facebook/callback",
-    profileFields: ['id', 'displayName', 'photos', 'email']
+    profileFields: ['id', 'displayName', 'picture', 'email']
   },
-  function(accessToken, refreshToken, profile, cb) {
-   console.log('accesToken///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////')
-    console.log(accessToken);
-    console.log('refreshToken///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////')
-    console.log(refreshToken);
-    console.log('profile///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////')
-    console.log(profile);
-    console.log('cb///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////')
-    console.log(cb);
+  async function(accessToken, refreshToken, profile, cb) {
+      let userExist = User.findOne({ "username" : profile.id });
+      if(!userExist){
+        const newUser = new User ({
+            socialId: profile.id,
+            socialProvider: 'facebook',
+            name: profile.displayName,
+            username: profile.id, 
+            mail: "anonymus@anonymus.anonymus",
+            password: uuidv4()
+        });
+
+        try{
+           let finalUser = newUser.save();
+           cb(undefined,finalUser);
+        }catch (err) {
+            cb(err,undefined);
+        }
+        return;
+      } else {
+          cb(undefined,userExist);
+      }
   }
 ));
