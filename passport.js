@@ -113,7 +113,8 @@ passport.use('googleToken', new GooglePlusTokenStrategy({
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "https://backend.bancdetemps.tk/users/oauth/facebook/callback"
+    callbackURL: "https://backend.bancdetemps.tk/users/oauth/facebook/callback",
+    profileFields: ['id', 'displayName', 'photos', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
    console.log('accesToken///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////')
