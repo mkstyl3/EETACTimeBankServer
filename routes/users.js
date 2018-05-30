@@ -29,6 +29,6 @@ router.get('/oauth/facebook',
     passport.authenticate('facebook'),user.facebookOauth);
 
 router.route('/oauth/facebook/callback') // Not used
-    .get(user.facebookCallback);
+    .get(passport.authenticate('facebook', { failureRedirect: '/login' },user.facebookCallback);
 
 module.exports = router;
