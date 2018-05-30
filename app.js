@@ -27,15 +27,12 @@ app.use(cors());
 
 // ExpressJS will parse the request before it got routed
 app.use(logger('dev'));
+app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
-
-app.configure(function() {
-    app.use(passport.initialize());
-});
 
 //Routes
 app.use('/users', require('./routes/users'));
