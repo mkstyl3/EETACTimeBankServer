@@ -121,6 +121,7 @@ passport.use(new FacebookStrategy({
     function (accessToken, refreshToken, profile, cb) {
         console.log('entres?');
         User.findOne({ "username": profile.id }, (err, userExist) => {
+            if(err) return;
             if (!userExist) {
                 const newUser = new User({
                     socialId: profile.id,
@@ -139,6 +140,7 @@ passport.use(new FacebookStrategy({
             }
             else {
                 console.log('carregues un usuari?');
+                console.log(userExist);
                 cb(err, userExist);
                 return;
             }
