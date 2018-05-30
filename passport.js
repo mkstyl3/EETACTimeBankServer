@@ -120,7 +120,7 @@ passport.use(new FacebookStrategy({
   },
   async function(accessToken, refreshToken, profile, cb) {
       console.log('entres?');
-      let userExist = User.findOne({ "username" : profile.id });
+      let userExist = await User.findOne({ "username" : profile.id });
       if(!userExist){
         const newUser = new User ({
             socialId: profile.id,
@@ -132,7 +132,7 @@ passport.use(new FacebookStrategy({
         });
 
         try{
-           let finalUser = newUser.save();
+           let finalUser = await newUser.save();
            console.log('guardes?');
            console.log(finalUser);
            cb(undefined,finalUser);
