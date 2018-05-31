@@ -129,12 +129,12 @@ module.exports = {
 
     facebookCallback: (req, res, next) => {
         const token = signToken(req.user);
-        res.status(200).json({
+        res.status(200).text("<script> localStorage.setItem('bncTmpUsr',"+JSON.stringify({
             'username': req.user.username,
             'token': token,
             'userId': req.user.id,
             'foto': req.user.image
-        });
+        })+") </script>");
     },
 
     secret: async (req, res, next) => {
