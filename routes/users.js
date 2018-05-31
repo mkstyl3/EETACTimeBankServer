@@ -28,6 +28,8 @@ router.route('/oauth/google/code')
 router.get('/oauth/facebook',
     passport.authenticate('facebook'),user.facebookOauth);
 
+router.post('/oauth/facebook/token', user.facebookToken);
+
 router.get('/oauth/facebook/callback',passport.authenticate('facebook',{ failureRedirect: '/login' }),user.facebookCallback);
 
 module.exports = router;

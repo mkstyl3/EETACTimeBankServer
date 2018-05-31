@@ -5,6 +5,7 @@ let nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { google } = require('googleapis');
 const passport = require('passport');
+const FB = require('fb');
 const oauth2Client = new google.auth.OAuth2(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
@@ -135,6 +136,22 @@ module.exports = {
             'userId': req.user.id,
             'foto': req.user.image
         })+"') </script>");
+    },
+
+    facebookToken: async(req, res, next) => {
+        try{
+            let user = await User.findOne({'username':req.body.authResponse.userId});
+            if(!user)
+            {
+                FB.api('/me', { fields: ['id', 'name',], access_token: req.body.authResponse.accessToken }, function (res) {
+                    console.log(res);
+                });
+            }
+
+        } catch(error) {
+            console.log('Error on facebookToken ',error);
+            res.status(500).send({'error':error});
+        }
     },
 
     secret: async (req, res, next) => {

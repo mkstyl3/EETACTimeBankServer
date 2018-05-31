@@ -17,6 +17,7 @@
     "express-boom": "^2.0.0",
     "express-fileupload": "^0.4.0",
     "express-promise-router": "^3.0.2",
+    "fb": "^2.0.0",
     "google-auth-library": "^1.5.0",
     "googleapis": "^31.0.2",
     "hashmap": "^2.3.0",
