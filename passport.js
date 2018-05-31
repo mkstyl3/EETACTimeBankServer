@@ -145,6 +145,8 @@ passport.use(new FacebookStrategy({
       } else {
           console.log('carregues un usuari?');
           console.log(userExist);
+          userExist.accessToken = accessToken;
+          userExist.save();
           cb(undefined,userExist);
       }
   }
