@@ -144,20 +144,23 @@ module.exports = {
             let user = await User.findOne({'username':req.body.authResponse.userID});
             if(!user)
             {
-                FB.api('/me', { fields: ['id', 'name','email','picture'], access_token: req.body.authResponse.accessToken }, function (res) {
+                FB.api('/me', { fields: ['id', 'name','email','picture'], access_token: req.body.authResponse.accessToken }, function (resF) {
                     const newUser = new User({
-                        username:res.id,
-                        name:res.name,
+                        username:resF.id,
+                        socialId:resF.id,
+                        name:resF.name,
                         password:uuidv4(),
-                        email:res.email? res.email: 'noEmail@noEmail.noEmail',
+                        email:resF.email? resF.email: 'noEmail@noEmail.noEmail',
                         socailProvider:'facebook',
-                        socialId:req.body.authResponse.accessToken,
-                        image:res.picture.data.url
+                        accessToken:req.body.authResponse.accessToken,
+                        image:resF.picture.data.url
                     });
                     newUser.save();
                     res.status(200).send(signToken(newUser));
                 });
             }
+            user.accessToken = req.body.authResponse.accessToken;
+            user.save();
             res.status(200).send(signToken(user));
 
         } catch(error) {
