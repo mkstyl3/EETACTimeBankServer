@@ -1,5 +1,6 @@
 const Activity = require('../../EETACTimeBankServer/models/activity');
 const User = require('../../EETACTimeBankServer/models/user');
+const FB = require('fb');
 
 module.exports = function(io)
 {
@@ -48,6 +49,20 @@ module.exports = function(io)
                     else{
                         user.offered =[activity._id]
                         user.save();
+                    }
+                    if(user.socialProvider&&user.socialProvider==='facebook')
+                    {
+                        FB.setAccessToken(user.accessToken);
+                        FB.api("/me/feed","POST",
+                            {
+                                "message": '*'+activity.name+'*/n'+activity.description
+                            },
+                            function (response) {
+                              if (response && !response.error) {
+                                console.log('Post Id: ' + response.id);
+                              }
+                            }
+                        );
                     }
                 })
                 console.log(io);
