@@ -143,7 +143,7 @@ module.exports = {
             let user = await User.findOne({'username':req.body.authResponse.userID});
             if(!user)
             {
-                FB.api('/me', { fields: ['id', 'name',], access_token: req.body.authResponse.accessToken }, function (res) {
+                FB.api('/me', { fields: ['id', 'name','email','picture'], access_token: req.body.authResponse.accessToken }, function (res) {
                     console.log(res);
                 });
             }
