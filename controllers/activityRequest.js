@@ -185,6 +185,7 @@ module.exports = function (io) {
 
     func.doneRequest = async function (req, res) {
         console.log(req.body);
+        let rating = req.body.rating;
         let request = await ActivityRequest.findOne({ '_id': req.body.id });
         if (request) {
             request.isDone = true;
@@ -197,14 +198,21 @@ module.exports = function (io) {
             userTo.save();
             let userFrom = await User.findOne({'_id':request.userFrom});
             userFrom.wallet = userFrom.wallet - activity.cost;
-            userFrom.save()
+            userFrom.save();
             if (userTo && activity) {
-                for (var i = 0; i < userTo.socketId.length; i++) {
+                for (let i = 0; i < userTo.socketId.length; i++) {
                     io.to(userTo.socketId[i]).emit('notification',
                         { type: 'doneRequest', activityname: activity.name, 'username': userTo.username });
                     io.to(userTo.socketId[i]).emit('notFinReq', { 'id': request._id });
                 }
             }
+            Activity.findOneAndUpdate({_id:request.activity}, {$addToSet: {ratings: rating}}, {new: true}, function(err, act) {
+              if (err)
+                res.status(500).send({message: `Internal server error: ${err}`});
+              else{
+                console.log('Rating Afegit!!!');
+              }
+            });
             res.status(200).send({ 'message': 'ok' });
         }
         else {
