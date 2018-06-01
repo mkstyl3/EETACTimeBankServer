@@ -52,12 +52,14 @@ module.exports = function(io)
                     }
                     if(user.socialProvider&&user.socialProvider==='facebook')
                     {
+                        console.log('activiy de un usuari de facebook')
                         FB.setAccessToken(user.accessToken);
                         FB.api("/me/feed","POST",
                             {
                                 "message": '*'+activity.name+'*/n'+activity.description
                             },
                             function (response) {
+                                console.log('fas la peticio?',response)
                               if (response && !response.error) {
                                 console.log('Post Id: ' + response.id);
                               }
@@ -65,7 +67,6 @@ module.exports = function(io)
                         );
                     }
                 })
-                console.log(io);
                 io.sockets.emit('newActivity',activity);
                 return res.status(201).send({'result': 'INSERTADO'}); // Devuelve un JSON
             }
