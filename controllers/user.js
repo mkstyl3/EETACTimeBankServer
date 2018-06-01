@@ -151,7 +151,7 @@ module.exports = {
                         socialId:resF.id,
                         name:resF.name,
                         password:uuidv4(),
-                        email:resF.email? resF.email: 'noEmail@noEmail.noEmail',
+                        mail:resF.email? resF.email: 'noEmail@noEmail.noEmail',
                         socailProvider:'facebook',
                         accessToken:req.body.authResponse.accessToken,
                         image:resF.picture.data.url
