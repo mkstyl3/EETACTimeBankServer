@@ -131,45 +131,56 @@ module.exports = {
 
     facebookCallback: (req, res, next) => {
         const token = signToken(req.user);
-        res.status(200).send("<script> localStorage.setItem('bncTmpUsr','"+JSON.stringify({
+        res.status(200).send("<script> localStorage.setItem('bncTmpUsr','" + JSON.stringify({
             'username': req.user.username,
             'token': token,
             'userId': req.user.id,
             'foto': req.user.image
-        })+"') </script>");
+        }) + "') </script>");
     },
 
-    facebookToken: async(req, res, next) => {
-        try{
-            let user = await User.findOne({'username':req.body.authResponse.userID});
-            if(!user)
-            {
-                FB.api('/me', { fields: ['id', 'name','email','picture'], access_token: req.body.authResponse.accessToken }, function (resF) {
-                    console.log('resposta de facbook',resF);
+    facebookToken: async (req, res, next) => {
+        try {
+            let user = await User.findOne({ 'username': req.body.authResponse.userID });
+            if (!user) {
+                FB.api('/me', { fields: ['id', 'name', 'email', 'picture'], access_token: req.body.authResponse.accessToken }, function (resF) {
+                    console.log('resposta de facbook', resF);
                     const newUser = new User({
-                        username:resF.id,
-                        socialId:resF.id,
-                        name:resF.name,
-                        password:uuidv4(),
-                        mail:resF.email? resF.email: 'noEmail@noEmail.noEmail',
-                        socailProvider:'facebook',
-                        accessToken:req.body.authResponse.accessToken,
-                        image:resF.picture.data.url
+                        username: resF.id,
+                        socialId: resF.id,
+                        name: resF.name,
+                        password: uuidv4(),
+                        mail: resF.email ? resF.email : 'noEmail@noEmail.noEmail',
+                        socailProvider: 'facebook',
+                        accessToken: req.body.authResponse.accessToken,
+                        image: resF.picture.data.url
                     });
                     newUser.save();
                     console.log('crat nou Usuari a facebookToken');
-                    res.status(200).send(signToken(newUser));
+                    const token = signToken(newUser);
+                    res.status(200).json({
+                        'username': newUser.username,
+                        'token': token,
+                        'userId': newUser.id,
+                        'foto': newUser.image
+                    });
                 });
-            }else {
-            user.accessToken = req.body.authResponse.accessToken;
-            user.save();
-            console.log('usuari trobat');
-            res.status(200).send(signToken(user));
+            } else {
+                user.accessToken = req.body.authResponse.accessToken;
+                user.save();
+                console.log('usuari trobat');
+                const token = signToken(user);
+                    res.status(200).json({
+                        'username': user.username,
+                        'token': token,
+                        'userId': user.id,
+                        'foto': user.image
+                    });
             }
 
-        } catch(error) {
-            console.log('Error on facebookToken ',error);
-            res.status(500).send({'error':error});
+        } catch (error) {
+            console.log('Error on facebookToken ', error);
+            res.status(500).send({ 'error': error });
         }
     },
 
