@@ -140,7 +140,7 @@ module.exports = {
 
     facebookToken: async(req, res, next) => {
         try{
-            let user = await User.findOne({'username':req.body.authResponse.userId});
+            let user = await User.findOne({'username':req.body.authResponse.userID});
             if(!user)
             {
                 FB.api('/me', { fields: ['id', 'name',], access_token: req.body.authResponse.accessToken }, function (res) {
