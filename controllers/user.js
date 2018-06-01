@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const { google } = require('googleapis');
 const passport = require('passport');
 const FB = require('fb');
+const uuidv4 = require('uuid/v4');
 const oauth2Client = new google.auth.OAuth2(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
@@ -144,9 +145,20 @@ module.exports = {
             if(!user)
             {
                 FB.api('/me', { fields: ['id', 'name','email','picture'], access_token: req.body.authResponse.accessToken }, function (res) {
-                    console.log(res);
+                    const newUser = new User({
+                        username:res.id,
+                        name:res.name,
+                        password:uuidv4(),
+                        email:res.email? res.email: 'noEmail@noEmail.noEmail',
+                        socailProvider:'facebook',
+                        socialId:req.body.authResponse.accessToken,
+                        image:res.picture.data.url
+                    });
+                    newUser.save();
+                    res.status(200).send(signToken(newUser));
                 });
             }
+            res.status(200).send(signToken(user));
 
         } catch(error) {
             console.log('Error on facebookToken ',error);
