@@ -145,6 +145,7 @@ module.exports = {
             if(!user)
             {
                 FB.api('/me', { fields: ['id', 'name','email','picture'], access_token: req.body.authResponse.accessToken }, function (resF) {
+                    console.log('resposta de facbook',resF);
                     const newUser = new User({
                         username:resF.id,
                         socialId:resF.id,
@@ -156,12 +157,15 @@ module.exports = {
                         image:resF.picture.data.url
                     });
                     newUser.save();
+                    console.log('crat nou Usuari a facebookToken');
                     res.status(200).send(signToken(newUser));
                 });
-            }
+            }else {
             user.accessToken = req.body.authResponse.accessToken;
             user.save();
+            console.log('usuari trobat');
             res.status(200).send(signToken(user));
+            }
 
         } catch(error) {
             console.log('Error on facebookToken ',error);
