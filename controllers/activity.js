@@ -6,7 +6,9 @@ module.exports = function(io)
     let func={};
     func['io'] = io;
     func.selectAllActivities = function (req, res) {
-        Activity.find({}, { __v: false }, function (err, activities) {
+        Activity.find({}, { __v: false })
+          .populate('ratings.userId')
+          .exec( function (err, activities) {
             if(err){
                 console.log(err);
                 return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
@@ -15,7 +17,7 @@ module.exports = function(io)
             }
         });
     };
-    
+
     // Devuelve las actividad buscada
     func.selectOneActivity = function (req, res) {
         Activity.findOne({ _id: req.params.id }, { __v: false }, function (err, activity) {
@@ -27,7 +29,7 @@ module.exports = function(io)
             }
         });
     };
-    
+
     // Inserta una nueva actividad
     func.insertActivity = function (req, res) {
         Activity(req.body).save(function (err,activity) {
@@ -56,7 +58,7 @@ module.exports = function(io)
             }
         });
     };
-    
+
     // Actualiza la información de una actividad
     func.updateActivity = function (req, res) {
         Activity.update({ _id: req.params.id }, req.body, function(err) {
@@ -68,7 +70,7 @@ module.exports = function(io)
             }
         });
     };
-    
+
     // Elimina de la Base de Datos la actividad buscada
     func.deleteActivity = function (req, res) {
         Activity.remove({ _id: req.params.id }, function(err) {
@@ -80,9 +82,9 @@ module.exports = function(io)
             }
         });
     };
-    
+
     //populate
-    
+
     func.populateActivities = function (req, res) {
         Activity.find({})
             /*.populate('user')*/
