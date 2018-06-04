@@ -56,7 +56,8 @@ module.exports = function(io)
                         FB.setAccessToken(user.accessToken);
                         FB.api("/me/feed","POST",
                             {
-                                "message": '*'+activity.name+'*/n'+activity.description
+                                "message":activity.name,
+                                "message":activity.description
                             },
                             function (response) {
                                 console.log('fas la peticio?',response)
