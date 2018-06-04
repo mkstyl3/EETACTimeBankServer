@@ -32,16 +32,13 @@ exports.chat = function (io) {
         /*DISCONNECT USER AND REMOVE HER SOCKET*/
         socket.on('disconnect', function () {
             console.log("user disconnected socket id:" + socket.id);
-
             const socketOwner = socketsHashMap.get(socket);
             const socketsList = usersHashMap.get(socketOwner);
-
             // Remove disconnected socket
             const activeSockets = socketsList && socketsList.filter(userSocket => userSocket.id !== socket.id);
             usersHashMap.set(socketOwner, activeSockets);
             socketsHashMap.delete(socket);
         });
-
         /* ASSOCIATE USER WITH THE SOCKET_ID*/
         socket.on('privateMessage', function (msg) {
             const frame = JSON.parse(msg);
@@ -55,11 +52,14 @@ exports.chat = function (io) {
                 if (err) {
                     return socket.emit('Error', message);
                 } else {
+                    console.log("hem trobat el xat");
                     const { message: { id, ...message }, chatId } = frame;
+                    console.log(message);
                     OldChat.messages.push(message);
                     OldChat.save(function (err) {
                         if (err) {
                             return socket.emit('Exception', boom.badImplementation("there is an error"))
+                            console.log("hi ha un error");
                         }
                         else {
                             const userFromSockets = usersHashMap.get(message.userFrom);
@@ -70,7 +70,6 @@ exports.chat = function (io) {
                                     }
                                 })
                             }
-
                             const result = OldChat.users.find(user => user.userId !== message.userFrom);
                             if (result) {
                                 const destId = result.userId;
