@@ -13,7 +13,8 @@ router.route('/signin').post(validateBody(schemas.signIn),
 router.get('/', passport.authenticate('jwt', { session: false }), user.selectAllUsers);             // Devuelve una lista con todos los usuarios
 router.get('/:name', passport.authenticate('jwt', { session: false }), user.selectOneUser);         // Devuelve el usuario buscado
 //router.post('/', user.insertUser);                                                                // Inserta un nuevo usuario (username único)
-router.put('/:name', passport.authenticate('jwt', { session: false }), user.updateUser);            // Actualiza la información de un usuario
+router.put('/:username', passport.authenticate('jwt', { session: false }), user.updateUser);            // Actualiza la información de un usuario
+router.put('/:username/checkThePassword', passport.authenticate('jwt', { session: false }), user.checkThePassword);            // Actualiza la información de un usuario
 router.delete('/:name', passport.authenticate('jwt', { session: false }), user.deleteUser);         // Elimina de la Base de Datos el usuario buscado
 router.post('/getUserById', passport.authenticate('jwt', { session: false }), user.getUserById);    // Devuelve un usuario por su id que es unica
 

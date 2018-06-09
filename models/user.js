@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema(
     {
         socialProvider:{type:String},
-        accesToken:    {type:String},
+        accessToken:    {type:String},
         socialId:    { type: String },
         username:    { type: String, required: true, unique: true },  // Campo obligatório para insertar
         password:    { type: String },                                // Campo obligatório para insertar
@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
         firstSave:   { type: Boolean }
     }
 );
+
 
 userSchema.pre('save', async function (next) {
     try {

@@ -1,5 +1,6 @@
 const Activity = require('../../EETACTimeBankServer/models/activity');
 const User = require('../../EETACTimeBankServer/models/user');
+const FB = require('fb');
 
 module.exports = function(io)
 {
@@ -51,8 +52,24 @@ module.exports = function(io)
                         user.offered =[activity._id]
                         user.save();
                     }
+                    if(user.socialProvider&&user.socialProvider==='facebook')
+                    {
+                        console.log('activiy de un usuari de facebook')
+                        FB.setAccessToken(user.accessToken);
+                        FB.api("/me/feed","POST",
+                            {
+                                "message":activity.name,
+                                "message":activity.description
+                            },
+                            function (response) {
+                                console.log('fas la peticio?',response)
+                              if (response && !response.error) {
+                                console.log('Post Id: ' + response.id);
+                              }
+                            }
+                        );
+                    }
                 })
-                console.log(io);
                 io.sockets.emit('newActivity',activity);
                 return res.status(201).send({'result': 'INSERTADO'}); // Devuelve un JSON
             }
@@ -109,14 +126,19 @@ module.exports = function(io)
         });
     }
     func.filtranombre = function (req, res) {
-        Activity.find({$and:[{$or: [{ name: {$regex : ".*"+req.body.name+".*"} },
-                { tags: {$regex : ".*"+req.body.name+".*"} },{ category: {$regex : ".*"+req.body.name+".*"} } ] }, {cost:{$lt: req.body.cost+1}}]}, { __v: false }, function (err, activity) {
-        //Activity.find({cost:{$lt: req.body.cost}}, { __v: false }, function (err, activity) {
+        console.log(req.body.latitude);
+        console.log(req.body.distance);
+        //Activity.find({ location: {$near: { $geometry: { type: "Point",  coordinates: [req.body.latitude,req.body.longitude ] },
+         //           $maxDistance: req.body.distance*1000}} }, { __v: false }, function (err, activity) {
+         Activity.find({$and:[{ location: {$near: { $geometry: { type: "Point",  coordinates: [req.body.latitude,req.body.longitude ] },
+                         $maxDistance: req.body.distance*1000}} } ,{$or: [{ name: {$regex : ".*"+req.body.name+".*"} },
+              { tags: {$regex : ".*"+req.body.name+".*"} },{ category: {$regex : ".*"+req.body.name+".*"} } ] }, {cost:{$lt: req.body.cost+1}}]}, { __v: false }, function (err, activity) {
+        //Activity.find({$and: [{cost:{$lt: req.body.cost+1}},{$text: {$search: req.body.name}}]}, { __v: false }, function (err, activity) {
             if(err){
                 console.log(err);
                 return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
             }else{
-                console.log(activity);
+                //console.log(activity);
                 return res.status(200).send(activity);             // Devuelve un JSON
             }
         });

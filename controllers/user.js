@@ -6,22 +6,24 @@ const bcrypt = require('bcrypt');
 const { google } = require('googleapis');
 const passport = require('passport');
 const FB = require('fb');
+const uuidv4 = require('uuid/v4');
+const boom = require('boom');
 const oauth2Client = new google.auth.OAuth2(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URL,
-);
+  );
 
 // generate a url that asks permissions for Google+ and Google Calendar scopes
 const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile'
 ];
-
+   
 const url = oauth2Client.generateAuthUrl({
     // 'online' (default) or 'offline' (gets refresh_token)
     access_type: 'offline',
-
+   
     // If you only need one scope you can pass it as a string
     scope: scopes
 });
@@ -32,7 +34,7 @@ signToken = user => {
         iss: 'eetac.upc.ea',
         sub: user.id,
         iat: new Date().getTime(),
-        exp: new Date().setDate(new Date().getDate() + 1) // Current time +1 day ahead
+        exp: new Date().setDate(new Date().getDate() +1) // Current time +1 day ahead
     }, JWT_SECRET);
 };
 
@@ -45,7 +47,7 @@ module.exports = {
             'username': req.user.username,
             'token': token,
             'userId': req.user.id,
-            'foto': req.user.image
+            'foto':req.user.image
         });
     },
 
@@ -55,8 +57,8 @@ module.exports = {
 
         //Check if there is a user with the same username
         const foundUser = await User.findOne({ username: req.value.body.username });
-        if (foundUser) {
-            return res.status(403).json({ dbError: 'Duplicated' })
+        if(foundUser) {
+            return res.status(403).json({ dbError : 'Duplicated'})
         }
 
         //console.log(req.value.body);
@@ -113,11 +115,11 @@ module.exports = {
         //const profile = req.body.profile;
         const { tokens } = await oauth2Client.getToken(req.body.code);
         oauth2Client.setCredentials(tokens);
-
-
+        
+        
         console.log(tokens);
         // const token = signToken(req.user);
-        res.status(200).json(tokens); // Pass only the token we want
+        res.status(200).json( tokens ); // Pass only the token we want
     },
 
     googleOauthCallback: async (req, res, next) => { // Not used
@@ -130,103 +132,176 @@ module.exports = {
 
     facebookCallback: (req, res, next) => {
         const token = signToken(req.user);
-        res.status(200).send("<script> localStorage.setItem('bncTmpUsr','"+JSON.stringify({
+        res.status(200).send("<script> localStorage.setItem('bncTmpUsr','" + JSON.stringify({
             'username': req.user.username,
             'token': token,
             'userId': req.user.id,
             'foto': req.user.image
-        })+"') </script>");
+        }) + "') </script>");
     },
 
-    facebookToken: async(req, res, next) => {
-        try{
-            let user = await User.findOne({'username':req.body.authResponse.userId});
-            if(!user)
-            {
-                FB.api('/me', { fields: ['id', 'name',], access_token: req.body.authResponse.accessToken }, function (res) {
-                    console.log(res);
+    facebookToken: async (req, res, next) => {
+        try {
+            let user = await User.findOne({ 'username': req.body.authResponse.userID });
+            if (!user) {
+                FB.api('/me', { fields: ['id', 'name', 'email', 'picture'], access_token: req.body.authResponse.accessToken }, function (resF) {
+                    console.log('resposta de facbook', resF);
+                    const newUser = new User({
+                        username: resF.id,
+                        socialId: resF.id,
+                        name: resF.name,
+                        password: uuidv4(),
+                        mail: resF.email ? resF.email : 'noEmail@noEmail.noEmail',
+                        socialProvider: 'facebook',
+                        accessToken: req.body.authResponse.accessToken,
+                        image: resF.picture.data.url
+                    });
+                    newUser.save();
+                    console.log('crat nou Usuari a facebookToken');
+                    const token = signToken(newUser);
+                    res.status(200).json({
+                        'username': newUser.username,
+                        'token': token,
+                        'userId': newUser.id,
+                        'foto': newUser.image
+                    });
                 });
+            } else {
+                user.accessToken = req.body.authResponse.accessToken;
+                user.save();
+                console.log('usuari trobat');
+                const token = signToken(user);
+                    res.status(200).json({
+                        'username': user.username,
+                        'token': token,
+                        'userId': user.id,
+                        'foto': user.image
+                    });
             }
 
-        } catch(error) {
-            console.log('Error on facebookToken ',error);
-            res.status(500).send({'error':error});
+        } catch (error) {
+            console.log('Error on facebookToken ', error);
+            res.status(500).send({ 'error': error });
         }
     },
 
     secret: async (req, res, next) => {
         console.log('I managed to get here!');
-        res.json({ secret: 'resource' });
+        res.json({ secret: 'resource'});
     },
 
     // Devuelve una lista con todos los usuarios
     selectAllUsers: async (req, res) => {
         User.find({}, { __v: false })
             .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
-            .exec(function (err, users) {
+            .exec( function (err, users) {
                 if (err) {
                     console.log(err);
-                    return res.status(202).send({ 'result': 'ERROR' });  // Devuelve un JSON
+                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
                 } else {
                     return res.status(200).send(users);                // Devuelve un JSON
-                }
-            });
+        }});
     },
 
     // Devuelve el usuario buscado
     selectOneUser: async (req, res) => {
         User.findOne({ username: req.params.name }, { __v: false })
-            .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
-            .exec(function (err, user) {
-                if (err) {
+            .populate('offered',{ __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+            .exec( function (err, user) {
+                if(err) {
                     console.log(err);
-                    return res.status(202).send({ 'result': 'ERROR' });  // Devuelve un JSON
-                } else {
+                    return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+                }else{
                     return res.status(200).send(user);                 // Devuelve un JSON
                 }
             }
-            );
+        );
     },
+
+    /*FUNCIONS FETES MINIM 2*/
 
     // Actualiza la información de un usuario
     updateUser: async (req, res) => {
-        User.update({ username: req.params.name }, req.body, function (err) {
-            if (err) {
+        User.findOneAndUpdate({ username: req.params.username }, req.body, function (err, user) {
+                if (err) return next(err);
+                if(user===null){
+                    return res.status(422).send({'result': 'ERROR'});
+
+                }
+                res.json(user);
+            });
+        },
+    checkThePassword: async(req,res) => {
+        const password = req.body.oldPassword;
+        const username = req.body.user.username;
+        const newPassword = req.body.newPassword;
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
+        const newpasswordHash = await bcrypt.hash(newPassword, salt);
+
+        User.findOne({username:username}).exec(function(err,user){
+            console.log("som aqui");
+            if(err){
                 console.log(err);
-                return res.status(202).send({ 'result': 'ERROR' });       // Devuelve un JSON
-            } else {
-                return res.status(200).send({ 'result': 'ACTUALIZADO' }); // Devuelve un JSON
+                return err;
             }
+
+            if(user) {
+                console.log("hem trobat l'usuari");
+                if (bcrypt.compareSync(password, req.body.user.password)) {
+                    console.log("la contrassenya es correcte");
+                    user.password = newpasswordHash;
+                    User.findOneAndUpdate({username: user.username}, user, function (err, userMOdified) {
+                        if (err) return (err);
+                        else {
+                            console.log( "the user"+user);
+                            res.json(user);
+                        }
+                    });
+                }
+                else{
+                    console.log("la contrassenya no es correcte");
+                    return res.status(422).send({'result': 'ERROR'});
+                }
+            }
+            else{ /*THE PASSWORD IS CORRECT*/
+
+                return res.status(422).send({'result': 'ERROR'});
+            }
+
         });
+
+
     },
+
+
+
+
+
 
     // Elimina de la Base de Datos el usuario buscado
     deleteUser: async (req, res) => {
         User.remove({ username: req.params.name }, function (err) {
             if (err) {
                 console.log(err);
-                return res.status(202).send({ 'result': 'ERROR' });     // Devuelve un JSON
-            } else {
-                return res.status(200).send({ 'result': 'ELIMINADO' }); // Devuelve un JSON
+                return res.status(202).send({'result': 'ERROR'});     // Devuelve un JSON
+            }else{
+                return res.status(200).send({'result': 'ELIMINADO'}); // Devuelve un JSON
             }
         });
     },
 
-
     // Devuelve un usuario por su id
     getUserById: async (req, res) => {
         User.findOne({ _id: req.body.id }, { __v: false })
-            .populate('offered', { __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
-            .exec(function (err, user) {
-                if (err) {
-                    console.log(err);
-                    return res.status(202).send({ 'result': 'ERROR' });  // Devuelve un JSON
-                } else {
-                    return res.status(200).send(user);                 // Devuelve un JSON
-                }
-            }
-            );
+        .populate('offered',{ __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+        .exec(function (err, user) {
+          if(err) {
+            console.log(err);
+            return res.status(202).send({'result': 'ERROR'});  // Devuelve un JSON
+          }else{
+            return res.status(200).send(user);                 // Devuelve un JSON
+          }
+        });
     }
-
-
 };
