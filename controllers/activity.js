@@ -8,7 +8,7 @@ module.exports = function(io)
     func['io'] = io;
     func.selectAllActivities = function (req, res) {
         Activity.find({}, { __v: false })
-          .populate('ratings.userId')
+          .populate('ratings.userId', 'name')
           .exec( function (err, activities) {
             if(err){
                 console.log(err);
