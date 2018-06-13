@@ -3,27 +3,39 @@ const Chat = require('../models/chat');
 const User = require('../models/user');
 const ChatController = require('../chat');
 /*RETURN A PARTICULAR CHAT BY THE ID ARREGLAR*/
-exports.getChat = function (req, res) {
+exports.getChatUsers = function (req, res) {
     if (req.params.id) {
-        Chat.findById(req.params.id, (err, chat) => {
+        Chat.findById(req.params.id, 'users', (err, { users }) => {
             if (err) return res.send(boom.badRequest());
-            //update messages
-            var i =0;
-            do{
-                if (chat.messages[i]!=undefined&&chat.messages[i].userFrom !== req.params.idUser && chat.messages[i].readIt === false) { //=>query with userId req.params.idUser
-                    chat.messages[i].readIt = true;
-                }
-             i+=1;
-            }
-            while(i<chat.messages.length);
-            chat.save();
-            res.status(200).send(chat);
+            res.status(200).send(users);
         });
     }
     else {
         return res.send(boom.badData("there's no an id"));
     }
 };
+
+exports.getChatMessages = function (req, res) {
+    if (req.params.id) {
+        Chat.findById(req.params.id, 'messages', (err, { messages }) => {
+            if (err) return res.send(boom.badRequest());
+            const { limit, offset } = req.query;
+            const allMessages = messages.reverse().slice(offset, offset + limit).map(message => {
+                if (message.userFrom !== req.params.idUser && message.readIt === false) {
+                    return { ...message, readIt: true };
+                } else {
+                    return message;
+                }
+            });
+
+            res.status(200).send(allMessages.reverse());
+        });
+    }
+    else {
+        return res.send(boom.badData("there's no an id"));
+    }
+};
+
 /*SAVING A TEST CHAT*/
 exports.saveTestChat = function (req, res) {
     Chat.create(req.body, function (err, chat) {
