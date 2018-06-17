@@ -2,6 +2,7 @@ const boom = require('boom');
 const Chat = require('../models/chat');
 const User = require('../models/user');
 const ChatController = require('../chat');
+const mongoose = require('mongoose');
 /*RETURN A PARTICULAR CHAT BY THE ID ARREGLAR*/
 exports.getChatUsers = function (req, res) {
     if (req.params.id) {
@@ -16,6 +17,42 @@ exports.getChatUsers = function (req, res) {
 };
 
 exports.getChatMessages = function (req, res) {
+    const { limit, offset } = req.query;
+    /*RETURN THE ACTUALL SIZE OF THE ARRAY COUNT = X*/
+    Chat.aggregate([{ $match:{_id:mongoose.Types.ObjectId(req.params.id)}},{$project: { count: { $size:"$messages" }}}], function(err, docs){
+        if (err){
+            console.log(err)
+        }else{
+            const size = (docs[0].count);
+            const inicial = size-limit;
+            console.log(inicial);
+            console.log(size);
+            Chat.findById(req.params.id,{messages:{$slice:[inicial, size]}, 'users' : 0}, (err, messages) => {
+                if (err)
+                {console.log(err);
+                    return res.send(boom.badRequest())};
+                console.log("los mensajes"+messages);
+                res.status(200).send(messages);
+            });
+
+
+
+
+
+
+        }
+    });
+    /*TAMANY DEL ARRAY - MISSATGES ENVIATS?*/
+    if (req.params.id) {
+
+    }
+    else {
+        console.log(error);
+        return res.send(boom.badData("there's no an id"));
+    }
+};
+/*
+* exports.getChatMessages = function (req, res) {
     if (req.params.id) {
         Chat.findById(req.params.id, 'messages', (err, { messages }) => {
             if (err) return res.send(boom.badRequest());
@@ -34,7 +71,9 @@ exports.getChatMessages = function (req, res) {
     else {
         return res.send(boom.badData("there's no an id"));
     }
-};
+};*/
+
+
 
 /*SAVING A TEST CHAT*/
 exports.saveTestChat = function (req, res) {
