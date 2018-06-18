@@ -19,11 +19,11 @@ const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile'
 ];
-   
+
 const url = oauth2Client.generateAuthUrl({
     // 'online' (default) or 'offline' (gets refresh_token)
     access_type: 'offline',
-   
+
     // If you only need one scope you can pass it as a string
     scope: scopes
 });
@@ -98,7 +98,7 @@ module.exports = {
     },
 
     googleOauth: async (req, res, next) => {
-        //Generate token 
+        //Generate token
         const user = req.user;
         console.log('user', user);
         const token = signToken(user);
@@ -110,13 +110,13 @@ module.exports = {
         });
     },
     googleCodeExchange: async (req, res, next) => {
-        //Generate token 
+        //Generate token
         console.log('lol!');
         //const profile = req.body.profile;
         const { tokens } = await oauth2Client.getToken(req.body.code);
         oauth2Client.setCredentials(tokens);
-        
-        
+
+
         console.log(tokens);
         // const token = signToken(req.user);
         res.status(200).json( tokens ); // Pass only the token we want
@@ -203,10 +203,10 @@ module.exports = {
         }});
     },
 
-    // Devuelve el usuario buscado
+    // Devuelve el usuario buscado //.populate('offered',{ __v: false })
     selectOneUser: async (req, res) => {
         User.findOne({ username: req.params.name }, { __v: false })
-            .populate('offered',{ __v: false }).populate('received', { __v: false }).populate('favorite', { __v: false })
+            .populate('received', { __v: false }).populate('favorite', { __v: false }).populate({path: 'offered', populate: { path: 'ratings.userId' }})
             .exec( function (err, user) {
                 if(err) {
                     console.log(err);
