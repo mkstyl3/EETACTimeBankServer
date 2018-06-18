@@ -6,9 +6,13 @@ const mongoose = require('mongoose');
 /*RETURN A PARTICULAR CHAT BY THE ID ARREGLAR*/
 exports.getChatUsers = function (req, res) {
     if (req.params.id) {
-        Chat.findById(req.params.id, 'users', (err, { users }) => {
+
+        console.log("********* req", req.params.id);
+        Chat.findById(req.params.id, (err, chats ) => {
+            console.log("****************** users: ", chats.users);
             if (err) return res.send(boom.badRequest());
-            res.status(200).send(users);
+            console.log("**** fin de getChatUsers!!!!!!");
+            res.status(200).send(chats.users);
         });
     }
     else {
@@ -17,34 +21,37 @@ exports.getChatUsers = function (req, res) {
 };
 
 exports.getChatMessages = function (req, res) {
-    const { limit, offset } = req.query;
-    /*RETURN THE ACTUALL SIZE OF THE ARRAY COUNT = X*/
-    Chat.aggregate([{ $match:{_id:mongoose.Types.ObjectId(req.params.id)}},{$project: { count: { $size:"$messages" }}}], function(err, docs){
-        if (err){
-            console.log(err)
-        }else{
-            const size = (docs[0].count);
-            const inicial = size-limit;
-            console.log(inicial);
-            console.log(size);
-            Chat.findById(req.params.id,{messages:{$slice:[inicial, size]}, 'users' : 0}, (err, messages) => {
-                if (err)
-                {console.log(err);
-                    return res.send(boom.badRequest())};
-                console.log("los mensajes"+messages);
-                res.status(200).send(messages);
-            });
-
-
-
-
-
-
-        }
-    });
-    /*TAMANY DEL ARRAY - MISSATGES ENVIATS?*/
     if (req.params.id) {
+        let { offset, limit } = req.query;
+        offset = parseInt(offset);
+        limit = parseInt(limit);
+        Chat.aggregate([{$match: {_id: mongoose.Types.ObjectId(req.params.id)}}, {$project: {count: {$size: "$messages"}}}], function (err, docs) {
+            if (err) {
+                console.log(err);
+                return res.send(boom.badRequest());
+            }
+            else {
+                const sizeOfMessages = (docs[0].count);
+                const lasMessagesChunk = limit > (sizeOfMessages - offset);
+                const inicial = lasMessagesChunk ? 0 : -(offset + limit);
+                const final = Math.max(lasMessagesChunk ? (sizeOfMessages - offset) : limit, 0);
 
+                console.log(inicial, final);
+                if(final) {
+                    Chat.findById(req.params.id, {messages: {$slice: [inicial, final]}, 'users': 0}, (err, messages) => {
+                        if (err) {
+                            console.log(err);
+                            return res.send(boom.badRequest())
+                        }
+                        console.log("los mensajes" + messages);
+                        res.status(200).send(messages);
+                    });
+                } else {
+                    console.log("No hay más mensajes!");
+                    res.status(200).send({ messages: [] });
+                }
+            }
+        });
     }
     else {
         console.log(error);
@@ -91,6 +98,7 @@ exports.getUserChats = function (req, res) {
     const chatsTosend = [];
     Chat.find({'users.userId':req.params.id}, (err, chats) => {
         if (err) return res.send(boom.badRequest());
+        if(chats){
         const size = chats.length;
 
         var i = 0;
@@ -120,7 +128,9 @@ exports.getUserChats = function (req, res) {
         }
         return res.status(200).send(chatsTosend);
 
-    })
+    }
+    console.log("no hi han xats");})
+
 };
 
 
@@ -132,11 +142,13 @@ exports.addChatToUsers = function (req, res) {
         }
 
         User.findOne({'username':req.body.user1}, ( err,user)=>{
+            console.log("creeem el xat");
             if (err) return res.send(boom.badRequest());
             const user1T = user;
             User.findOne({'username':req.body.user2}, ( err,user)=> {
                 if (err) return res.send(boom.badRequest());
                 if(user2){
+                    console.log("hem trobat l'usuari");
                 const user2T = user;
                 const newChat = {};
                 const user1= {};
@@ -149,7 +161,9 @@ exports.addChatToUsers = function (req, res) {
                 user2["userAvatar"] = user2T.image;
                 newChat["users"] = [user1,user2];
                 newChat["messages"] = [];
+
                 const chat = new Chat(newChat);
+                console.log("el chat"+chat);
                 Chat.create(chat, (err, chat) => {
                     /*THIS POINT SEND THE NEW CHAT TO USERS VIA SOCKET??*/
                     if(chat){

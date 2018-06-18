@@ -43,7 +43,7 @@ exports.chat = function (io) {
         socket.on('privateMessage', function (msg) {
             const frame = JSON.parse(msg);
             const { message, chatId } = frame;
-
+            console.log(chatId, message, usersHashMap);
             Chat.findOne({_id: chatId}, (err, OldChat) => {
                 if (!OldChat) {
                     console.log("no existeix el xat");
@@ -66,6 +66,7 @@ exports.chat = function (io) {
                             if (userFromSockets && userFromSockets.length) {
                                 userFromSockets.forEach(userSocket => {
                                     if (userSocket !== socket) {
+                                        console.log("trobem un altre usuari"+userSocket);
                                         userSocket.emit('privateMessage', { chatId, message })
                                     }
                                 })
@@ -77,6 +78,7 @@ exports.chat = function (io) {
                                 if (destUserSockets) {
                                     if (destUserSockets.length) {
                                         destUserSockets.forEach(function (userSocket) {
+                                            console.log("enviem el missatge");
                                             userSocket.emit('privateMessage', {chatId, message})
                                         });
                                     }
