@@ -126,13 +126,11 @@ module.exports = function(io)
         });
     }
     func.filtranombre = function (req, res) {
-        console.log(req.body.latitude);
-        console.log(req.body.distance);
-        //Activity.find({ location: {$near: { $geometry: { type: "Point",  coordinates: [req.body.latitude,req.body.longitude ] },
-         //           $maxDistance: req.body.distance*1000}} }, { __v: false }, function (err, activity) {
+
          Activity.find({$and:[{ location: {$near: { $geometry: { type: "Point",  coordinates: [req.body.latitude,req.body.longitude ] },
                          $maxDistance: req.body.distance*1000}} } ,{$or: [{ name: {$regex : ".*"+req.body.name+".*"} },
               { tags: {$regex : ".*"+req.body.name+".*"} },{ category: {$regex : ".*"+req.body.name+".*"} } ] }, {cost:{$lt: req.body.cost+1}}]}, { __v: false }, function (err, activity) {
+             //con full text:, no permite busqueda entre palabras
         //Activity.find({$and: [{cost:{$lt: req.body.cost+1}},{$text: {$search: req.body.name}}]}, { __v: false }, function (err, activity) {
             if(err){
                 console.log(err);
