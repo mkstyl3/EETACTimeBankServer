@@ -33,6 +33,8 @@ module.exports = function(io)
 
     // Inserta una nueva actividad
     func.insertActivity = function (req, res) {
+        req.body.location={ type: "Point",  coordinates: [req.body.latitude,req.body.longitude ] };
+        console.log(req.body);
         Activity(req.body).save(function (err,activity) {
             if(err){
                 console.log(err);
